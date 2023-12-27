@@ -1,6 +1,6 @@
 import { Box, Button, Stack, TextField } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 
 interface AdminTextProps {
   // setCurrentLessons: () => void
@@ -29,7 +29,7 @@ const AdminText = React.forwardRef(
 
     const updateLessons = async () => {
       try {
-        const updateIdMatches = updateId?.split('-')?.[1] === chapter
+        // const updateIdMatches = updateId?.split('-')?.[1] === chapter
         // await axios.post('/api/updateLessons', {
         //   body: JSON.stringify({
         //     id: (updateIdMatches && updateId) || `${Date.now()}-${chapter}`,

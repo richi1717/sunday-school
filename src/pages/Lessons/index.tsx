@@ -40,16 +40,6 @@ export default function Lessons({ isAdmin }: LessonsPropTypes) {
   console.log({ expandedDefault })
   if (isLoading) return <div>loaddddddddddddd offf</div>
 
-  const handleChange =
-    (book: string) => (e: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpanded(isExpanded ? book : false)
-    }
-
-  const handleSubChange =
-    (note: string) => (e: React.SyntheticEvent, isSubExpanded: boolean) => {
-      setSubExpanded(isSubExpanded ? note : false)
-    }
-
   const deleteLessons = async (book: string, chapter: string) => {
     console.log(book, chapter)
     try {
@@ -63,6 +53,7 @@ export default function Lessons({ isAdmin }: LessonsPropTypes) {
       //   await fetch(`${import.meta.env.VITE_DB_URL}/studies.json`)
       // ).json()
       // setCurrentLessons(temp)
+      setCurrentLessons({})
     } catch (err) {
       console.error(err)
     }
@@ -78,7 +69,9 @@ export default function Lessons({ isAdmin }: LessonsPropTypes) {
           <Accordion
             key={book}
             expanded={expanded === book}
-            onChange={handleChange(book)}
+            onChange={(_, isExpanded: boolean) => {
+              setExpanded(isExpanded ? book : false)
+            }}
             TransitionProps={{ unmountOnExit: true }}
           >
             <AccordionSummary expandIcon={<ExpandMoreIcon />}>
@@ -90,7 +83,9 @@ export default function Lessons({ isAdmin }: LessonsPropTypes) {
                 <AccordionDetails key={note}>
                   <Accordion
                     expanded={subExpanded === note}
-                    onChange={handleSubChange(note)}
+                    onChange={(_, isSubExpanded: boolean) => {
+                      setSubExpanded(isSubExpanded ? note : false)
+                    }}
                     TransitionProps={{ unmountOnExit: true }}
                   >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
