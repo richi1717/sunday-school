@@ -1,11 +1,13 @@
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import Page from './pages'
-import { CssBaseline, ThemeProvider, useMediaQuery } from '@mui/material'
+import { CssBaseline, Stack, ThemeProvider, useMediaQuery } from '@mui/material'
 import myTheme from './theme'
 import { ColorModeContext } from './components/ToggleColorMode'
+import { RouterProvider } from 'react-router-dom'
+import Router from './Router'
 
 const queryClient = new QueryClient()
+
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const [mode, setMode] = React.useState<'light' | 'dark'>(
@@ -23,17 +25,16 @@ function App() {
   const theme = React.useMemo(() => myTheme(mode), [mode])
 
   return (
-    <>
-      <ColorModeContext.Provider value={colorMode}>
-        <CssBaseline />
-        <ThemeProvider theme={theme}>
-          <QueryClientProvider client={queryClient}>
-            <CssBaseline />
-            <Page />
-          </QueryClientProvider>
-        </ThemeProvider>
-      </ColorModeContext.Provider>
-    </>
+    <ColorModeContext.Provider value={colorMode}>
+      <ThemeProvider theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          <CssBaseline />
+          <Stack sx={{ width: 1, height: '100vh' }}>
+            <RouterProvider router={Router} />
+          </Stack>
+        </QueryClientProvider>
+      </ThemeProvider>
+    </ColorModeContext.Provider>
   )
 }
 

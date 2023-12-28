@@ -11,7 +11,7 @@ import { useMemo, useRef, useState } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
-import { filterByBook } from './helpers'
+import { filterByBook } from '../../utils/helpers'
 import AdminText from './components/AdminText'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 

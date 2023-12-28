@@ -72,27 +72,27 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
 
   return (
     <Stack
-      direction={{ mobile: 'column-reverse', tablet: 'row' }}
+      direction="column"
       justifyContent="space-between"
       alignItems="center"
       p={2}
     >
-      <Typography
-        variant="h1"
-        sx={{
-          textAlign: 'center',
-          p: { tablet: 4 },
-          fontSize: { mobile: 40, tablet: 64 },
-        }}
-      >
-        Sunday School Notes
-      </Typography>
-      <Stack direction="row">
+      <Stack direction="row" alignSelf="flex-end">
         <ToggleColorMode />
         <Button sx={{ textTransform: 'none', p: 2 }} onClick={handleClick}>
           {isAdmin ? 'Logout' : 'Login'}
         </Button>
       </Stack>
+      <Typography
+        variant="h1"
+        sx={{
+          textAlign: 'center',
+          p: 2,
+          fontSize: { mobile: 40, tablet: 64 },
+        }}
+      >
+        Sunday School Notes
+      </Typography>
       <Dialog open={open} onClose={() => setOpen(false)} fullScreen={matches}>
         <DialogTitle
           sx={{ textAlign: 'center', fontSize: { mobile: 30, tablet: 44 } }}

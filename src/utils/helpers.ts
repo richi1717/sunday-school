@@ -48,84 +48,139 @@ const test = {
   },
 }
 
-export const filterByBook = (currentLessons: {
-  [key: string]: { [key: string]: string }
-}) => {
-  console.log(currentLessons)
+export const filterByBook = (
+  currentLessons: {
+    [key: string]: { [key: string]: string }
+  },
+  bookName: string,
+) => {
   const studies: { [key: string]: { [key: string]: string } } = test.studies
-  console.log({ studies })
 
-  return Object.keys(studies).map((book) => ({
-    book,
-    notes: studies[book],
+  const byBook = studies[bookName]
+
+  if (!byBook) return []
+
+  return Object.keys(studies[bookName]).map((note) => ({
+    [note]: byBook[note],
   }))
 }
 
-// const booksOfTheBibleToSort = [
-//   'Genesis',
-//   'Exodus',
-//   'Leviticus',
-//   'Numbers',
-//   'Deuteronomy',
-//   'Joshua',
-//   'Judges',
-//   'Ruth',
-//   '1 Samuel',
-//   '2 Samuel',
-//   '1 Kings',
-//   '2 Kings',
-//   '1 Chronicles',
-//   '2 Chronicles',
-//   'Ezra',
-//   'Nehemiah',
-//   'Esther',
-//   'Job',
-//   'Psalms',
-//   'Proverbs',
-//   'Ecclesiastes',
-//   'Song of Solomon',
-//   'Isaiah',
-//   'Jeremiah',
-//   'Lamentations',
-//   'Ezekiel',
-//   'Daniel',
-//   'Hosea',
-//   'Joel',
-//   'Amos',
-//   'Obadiah',
-//   'Jonah',
-//   'Micah',
-//   'Nahum',
-//   'Habakkuk',
-//   'Zephaniah',
-//   'Haggai',
-//   'Zechariah',
-//   'Malachi',
-//   'Matthew',
-//   'Mark',
-//   'Luke',
-//   'John',
-//   'Acts',
-//   'Romans',
-//   '1 Corinthians',
-//   '2 Corinthians',
-//   'Galatians',
-//   'Ephesians',
-//   'Philippians',
-//   'Colossians',
-//   '1 Thessalonians',
-//   '2 Thessalonians',
-//   '1 Timothy',
-//   '2 Timothy',
-//   'Titus',
-//   'Philemon',
-//   'Hebrews',
-//   'James',
-//   '1 Peter',
-//   '2 Peter',
-//   '1 John',
-//   '2 John',
-//   '3 John',
-//   'Jude',
-//   'Revelation',
-// ]
+export const getLastBook = (currentLessons: {
+  [key: string]: { [key: string]: string }
+}) => {
+  // const items = Object.keys(currentLessons)
+  const items = Object.keys(test.studies)
+
+  return items[items.length - 1]
+}
+
+export const getNextAndPreviousBooks = (currentBook: string) => {
+  // const items = Object.keys(currentLessons)
+  const found = booksOfTheBibleToSort.findIndex((book) => book === currentBook)
+
+  return {
+    previous: booksOfTheBibleToSort[found - 1],
+    next: booksOfTheBibleToSort[found + 1],
+  }
+}
+
+export const getNextAndPreviousChapter = (
+  chaptersArr: Chapter[],
+  chapter: string,
+) => {
+  // const items = Object.keys(currentLessons)
+  if (chaptersArr.length === 0) return { previous: undefined, next: undefined }
+
+  const chapters = chaptersArr.map((chaptersObj) => Object.keys(chaptersObj)[0])
+  const found = chapters.findIndex((chap) => chap === chapter)
+
+  return {
+    previous: chapters[found - 1],
+    next: chapters[found + 1],
+  }
+}
+
+interface Chapter {
+  [key: string]: string
+}
+
+export const lastChapterOfPreviousBook = (chapters: Chapter[]): string => {
+  // const items = Object.keys(currentLessons)
+  // const chapters = chaptersArr.map((chaptersObj) => Object.keys(chaptersObj)[0])
+  const length = chapters.length
+
+  if (length > 0) {
+    return Object.keys(chapters[length - 1])[0]
+  }
+
+  return '1'
+}
+
+const booksOfTheBibleToSort = [
+  'Genesis',
+  'Exodus',
+  'Leviticus',
+  'Numbers',
+  'Deuteronomy',
+  'Joshua',
+  'Judges',
+  'Ruth',
+  '1 Samuel',
+  '2 Samuel',
+  '1 Kings',
+  '2 Kings',
+  '1 Chronicles',
+  '2 Chronicles',
+  'Ezra',
+  'Nehemiah',
+  'Esther',
+  'Job',
+  'Psalms',
+  'Proverbs',
+  'Ecclesiastes',
+  'Song of Solomon',
+  'Isaiah',
+  'Jeremiah',
+  'Lamentations',
+  'Ezekiel',
+  'Daniel',
+  'Hosea',
+  'Joel',
+  'Amos',
+  'Obadiah',
+  'Jonah',
+  'Micah',
+  'Nahum',
+  'Habakkuk',
+  'Zephaniah',
+  'Haggai',
+  'Zechariah',
+  'Malachi',
+  'Matthew',
+  'Mark',
+  'Luke',
+  'John',
+  'Acts',
+  'Romans',
+  '1 Corinthians',
+  '2 Corinthians',
+  'Galatians',
+  'Ephesians',
+  'Philippians',
+  'Colossians',
+  '1 Thessalonians',
+  '2 Thessalonians',
+  '1 Timothy',
+  '2 Timothy',
+  'Titus',
+  'Philemon',
+  'Hebrews',
+  'James',
+  '1 Peter',
+  '2 Peter',
+  '1 John',
+  '2 John',
+  '3 John',
+  'Jude',
+  'Revelation',
+]
