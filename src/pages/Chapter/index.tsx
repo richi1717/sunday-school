@@ -11,7 +11,7 @@ import {
 } from '@mui/material'
 import EngineeringIcon from '@mui/icons-material/Engineering'
 // import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
 // import EditIcon from '@mui/icons-material/Edit'
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
@@ -23,9 +23,11 @@ import {
   lastChapterOfPreviousBook,
 } from '../../utils/helpers'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
+import useSwipe from '../../utils/useSwipe'
 
 export default function Chapter() {
+  const navigate = useNavigate()
   const { bookName = '', chapter = '' } = useParams()
   // console.log({ bookName, chapter })
   // const inputEl = useRef<HTMLInputElement>(null)
@@ -55,6 +57,45 @@ export default function Chapter() {
     [bookName],
   )
 
+  const onSwipedLeft = useCallback(() => {
+    if (previousAndNextButtonsForChapters.next) {
+      return navigate(`/${bookName}/${previousAndNextButtonsForChapters.next}`)
+    }
+    if (previousAndNextButtonsForBooks.next) {
+      return navigate(`/${previousAndNextButtonsForBooks.next}/1`)
+    }
+  }, [
+    previousAndNextButtonsForBooks.next,
+    previousAndNextButtonsForChapters.next,
+    bookName,
+    navigate,
+  ])
+
+  const onSwipedRight = useCallback(() => {
+    if (previousAndNextButtonsForChapters.previous) {
+      return navigate(
+        `/${bookName}/${previousAndNextButtonsForChapters.previous}`,
+      )
+    }
+    if (previousAndNextButtonsForBooks.previous) {
+      const number = lastChapterOfPreviousBook(
+        filterByBook(lessonsData, previousAndNextButtonsForBooks.previous),
+      )
+
+      return navigate(`/${previousAndNextButtonsForBooks.previous}/${number}`)
+    }
+  }, [
+    previousAndNextButtonsForBooks.previous,
+    previousAndNextButtonsForChapters.previous,
+    bookName,
+    navigate,
+    lessonsData,
+  ])
+
+  const swiperNoSwiping = useSwipe({
+    onSwipedLeft,
+    onSwipedRight,
+  })
   // console.log({
   //   previousAndNextButtonsForChapters,
   //   previousAndNextButtonsForBooks,
@@ -136,7 +177,11 @@ export default function Chapter() {
   }
 
   return (
-    <Stack spacing={2} padding={{ mobile: 3, tablet: 5 }}>
+    <Stack
+      sx={{ p: { mobile: 3, tablet: 5 }, height: 1 }}
+      spacing={2}
+      {...swiperNoSwiping}
+    >
       <Stack
         direction="column"
         justifyContent="space-between"
