@@ -1,23 +1,23 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
+  // Accordion,
+  // AccordionDetails,
+  // AccordionSummary,
   Box,
   Button,
-  CircularProgress,
+  // CircularProgress,
   // IconButton,
   Stack,
   Typography,
 } from '@mui/material'
 import EngineeringIcon from '@mui/icons-material/Engineering'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useMemo, useRef, useState } from 'react'
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { useMemo } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
 // import EditIcon from '@mui/icons-material/Edit'
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import {
   filterByBook,
-  getLastBook,
+  // getLastBook,
   getNextAndPreviousBooks,
   getNextAndPreviousChapter,
   lastChapterOfPreviousBook,
@@ -27,26 +27,24 @@ import { Link, useParams } from 'react-router-dom'
 
 export default function Chapter() {
   const { bookName = '', chapter = '' } = useParams()
-  console.log({ bookName, chapter })
+  // console.log({ bookName, chapter })
   // const inputEl = useRef<HTMLInputElement>(null)
-  const [lesson, setLesson] = useState('')
-  const [updateId, setUpdateId] = useState('')
-  const [currentLessons, setCurrentLessons] = useState({})
-  const { data } = useLessonsQuery()
-  console.log({ data })
+  // const [lesson, setLesson] = useState('')
+  // const [updateId, setUpdateId] = useState('')
+  const { data: lessonsData } = useLessonsQuery()
+  // console.log({ lessonsData })
   const filteredByBook = useMemo(
-    () => filterByBook(currentLessons, bookName),
-    [currentLessons, bookName],
+    () => filterByBook(lessonsData, bookName),
+    [lessonsData, bookName],
   )
+  console.log({ filteredByBook })
 
   const filteredByChapter = useMemo(
-    () =>
-      filterByBook(currentLessons, bookName).find((book) => book[chapter])?.[
-        chapter
-      ],
-    [currentLessons, bookName, chapter],
+    () => filteredByBook[Number(chapter)],
+    [filteredByBook, chapter],
   )
 
+  console.log({ filteredByChapter })
   const previousAndNextButtonsForChapters = useMemo(
     () => getNextAndPreviousChapter(filteredByBook, chapter),
     [filteredByBook, chapter],
@@ -57,47 +55,47 @@ export default function Chapter() {
     [bookName],
   )
 
-  console.log({
-    previousAndNextButtonsForChapters,
-    previousAndNextButtonsForBooks,
-  })
-  const lastIndex = useMemo(() => filteredByBook?.length - 1, [filteredByBook])
+  // console.log({
+  //   previousAndNextButtonsForChapters,
+  //   previousAndNextButtonsForBooks,
+  // })
+  // const lastIndex = useMemo(() => filteredByBook?.length - 1, [filteredByBook])
 
   // const lastSubIndex = useMemo(() => filterByBook(currentLessons, bookName)?.length - 1, [currentLessons])
-  console.log(lastIndex, filteredByBook, currentLessons)
-  const expandedDefault = filteredByBook?.[lastIndex]?.book
-  const [expanded, setExpanded] = useState<boolean | string>(expandedDefault)
-  const [subExpanded, setSubExpanded] = useState<boolean | string>(
-    expandedDefault,
-  )
-  console.log({ expandedDefault, lesson, updateId, lastOne: getLastBook() })
+  // console.log(lastIndex, filteredByBook)
+  // const expandedDefault = filteredByBook?.[lastIndex]?.book
+  // const [expanded, setExpanded] = useState<boolean | string>(expandedDefault)
+  // const [subExpanded, setSubExpanded] = useState<boolean | string>(
+  //   expandedDefault,
+  // )
+  // console.log({ expandedDefault, lesson, updateId, lastOne: getLastBook() })
 
-  const deleteLessons = async (book: string, chapter: string) => {
-    console.log(book, chapter)
-    try {
-      // await fetch('/api/deleteLessons', {
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     id,
-      //   }),
-      // })
-      // const temp = await (
-      //   await fetch(`${import.meta.env.VITE_DB_URL}/studies.json`)
-      // ).json()
-      // setCurrentLessons(temp)
-      setCurrentLessons({})
-    } catch (err) {
-      console.error(err)
-    }
-    setUpdateId('')
-  }
+  // const deleteLessons = async (book: string, chapter: string) => {
+  //   console.log(book, chapter)
+  //   try {
+  //     // await fetch('/api/deleteLessons', {
+  //     //   method: 'POST',
+  //     //   body: JSON.stringify({
+  //     //     id,
+  //     //   }),
+  //     // })
+  //     // const temp = await (
+  //     //   await fetch(`${import.meta.env.VITE_DB_URL}/studies.json`)
+  //     // ).json()
+  //     // setCurrentLessons(temp)
+  //     setCurrentLessons({})
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  //   setUpdateId('')
+  // }
 
   const renderPreviousAndNextButton = (next: boolean) => {
     if (previousAndNextButtonsForChapters[next ? 'next' : 'previous']) {
       return (
         <Button
           component={Link}
-          to={`/books/${bookName}/${
+          to={`/${bookName}/${
             previousAndNextButtonsForChapters[next ? 'next' : 'previous']
           }`}
           variant="contained"
@@ -114,14 +112,14 @@ export default function Chapter() {
     if (previousAndNextButtonsForBooks[next ? 'next' : 'previous']) {
       const number = !next
         ? lastChapterOfPreviousBook(
-            filterByBook(data, previousAndNextButtonsForBooks.previous),
+            filterByBook(lessonsData, previousAndNextButtonsForBooks.previous),
           )
         : '1'
 
       return (
         <Button
           component={Link}
-          to={`/books/${
+          to={`/${
             previousAndNextButtonsForBooks[next ? 'next' : 'previous']
           }/${number}`}
           variant="contained"

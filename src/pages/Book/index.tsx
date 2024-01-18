@@ -4,36 +4,35 @@ import {
   AccordionSummary,
   Box,
   Button,
-  CircularProgress,
   // IconButton,
   Stack,
   Typography,
 } from '@mui/material'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
-import { useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
 // import EditIcon from '@mui/icons-material/Edit'
 // import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import {
   filterByBook,
-  getLastBook,
+  // getLastBook,
   getNextAndPreviousBooks,
 } from '../../utils/helpers'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { Link, useParams } from 'react-router-dom'
 
 export default function Book() {
-  const { bookName, ...rest } = useParams()
-  console.log({ bookName, rest })
+  const { bookName = '' } = useParams()
   // const inputEl = useRef<HTMLInputElement>(null)
   const [lesson, setLesson] = useState('')
   const [updateId, setUpdateId] = useState('')
   const [currentLessons, setCurrentLessons] = useState({})
+  console.log(lesson, updateId, setCurrentLessons)
   const { data } = useLessonsQuery()
   console.log({ data })
   const filteredByBook = useMemo(
-    () => filterByBook(currentLessons, bookName),
-    [currentLessons, bookName],
+    () => filterByBook(data, bookName),
+    [data, bookName],
   )
   const previousAndNextButtons = useMemo(
     () => getNextAndPreviousBooks(bookName),
@@ -45,31 +44,31 @@ export default function Book() {
   // const lastSubIndex = useMemo(() => filterByBook(currentLessons, bookName)?.length - 1, [currentLessons])
   console.log(lastIndex, filteredByBook, currentLessons)
   const expandedDefault = filteredByBook?.[lastIndex]?.book
-  const [expanded, setExpanded] = useState<boolean | string>(expandedDefault)
+  // const [expanded, setExpanded] = useState<boolean | string>(expandedDefault)
   const [subExpanded, setSubExpanded] = useState<boolean | string>(
     expandedDefault,
   )
-  console.log({ expandedDefault, lesson, updateId, lastOne: getLastBook() })
+  // console.log({ expandedDefault, lesson, updateId, lastOne: getLastBook() })
 
-  const deleteLessons = async (book: string, chapter: string) => {
-    console.log(book, chapter)
-    try {
-      // await fetch('/api/deleteLessons', {
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     id,
-      //   }),
-      // })
-      // const temp = await (
-      //   await fetch(`${import.meta.env.VITE_DB_URL}/studies.json`)
-      // ).json()
-      // setCurrentLessons(temp)
-      setCurrentLessons({})
-    } catch (err) {
-      console.error(err)
-    }
-    setUpdateId('')
-  }
+  // const deleteLessons = async (book: string, chapter: string) => {
+  //   console.log(book, chapter)
+  //   try {
+  //     // await fetch('/api/deleteLessons', {
+  //     //   method: 'POST',
+  //     //   body: JSON.stringify({
+  //     //     id,
+  //     //   }),
+  //     // })
+  //     // const temp = await (
+  //     //   await fetch(`${import.meta.env.VITE_DB_URL}/studies.json`)
+  //     // ).json()
+  //     // setCurrentLessons(temp)
+  //     setCurrentLessons({})
+  //   } catch (err) {
+  //     console.error(err)
+  //   }
+  //   setUpdateId('')
+  // }
 
   const renderPreviousAndNextButton = (next: boolean) => {
     if (previousAndNextButtons[next ? 'next' : 'previous'])

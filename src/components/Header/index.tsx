@@ -17,6 +17,7 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import axios from 'axios'
 import ToggleColorMode from '../ToggleColorMode'
 import { useMutation } from '@tanstack/react-query'
+import BookAndChapterDialog from './components/BookAndChapterDialog'
 
 interface HeaderProps {
   isAdmin: boolean
@@ -26,6 +27,7 @@ interface HeaderProps {
 export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [bookSelectOpen, setBookSelectOpen] = useState(false)
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const theme = useTheme()
@@ -77,11 +79,20 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
       alignItems="center"
       p={2}
     >
-      <Stack direction="row" alignSelf="flex-end">
-        <ToggleColorMode />
-        <Button sx={{ textTransform: 'none', p: 2 }} onClick={handleClick}>
-          {isAdmin ? 'Logout' : 'Login'}
+      <Stack direction="row" justifyContent="space-between" width={1}>
+        <Button
+          sx={{ textTransform: 'none', p: 2 }}
+          onClick={() => setBookSelectOpen(true)}
+        >
+          Book & Chapter
         </Button>
+
+        <Stack direction="row">
+          <ToggleColorMode />
+          <Button sx={{ textTransform: 'none', p: 2 }} onClick={handleClick}>
+            {isAdmin ? 'Logout' : 'Login'}
+          </Button>
+        </Stack>
       </Stack>
       <Typography
         variant="h1"
@@ -147,6 +158,11 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
           </Stack>
         </DialogContent>
       </Dialog>
+      <BookAndChapterDialog
+        open={bookSelectOpen}
+        closeDialog={() => setBookSelectOpen(false)}
+        fullScreen={matches}
+      />
     </Stack>
   )
 }
