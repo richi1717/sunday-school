@@ -52,10 +52,6 @@ type CurrentLessons = {
   [key: string]: string[]
 }
 
-type CurrentLessons = {
-  [key: string]: string[]
-}
-
 export const filterByBook = (
   currentLessons: CurrentLessons,
   bookName: string,
