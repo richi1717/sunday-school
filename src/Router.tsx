@@ -1,18 +1,24 @@
 import Layout from './components/Layout'
-import Book from './pages/Book'
+import AddLesson from './pages/AddLesson'
+import EditLesson from './pages/EditLesson'
 import { createBrowserRouter } from 'react-router-dom'
 import Chapter from './pages/Chapter'
 // import Lessons from './pages/Lessons'
+import Welcome from './pages/Welcome'
 
 const Router = createBrowserRouter([
   {
     path: '/',
     element: <Layout />,
     children: [
-      // { path: '/', element: <Lessons /> },
+      { path: '/', element: <Welcome /> },
       {
-        path: ':bookName/',
-        element: <Book />,
+        path: 'add-lesson/',
+        element: <AddLesson />,
+      },
+      {
+        path: 'edit-lesson/',
+        element: <EditLesson />,
       },
       {
         path: ':bookName/:chapter',

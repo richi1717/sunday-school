@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   Alert,
   Button,
@@ -7,9 +7,12 @@ import {
   DialogContent,
   DialogTitle,
   IconButton,
+  Link,
+  Menu,
+  MenuItem,
   Stack,
   TextField,
-  Typography,
+  capitalize,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { useTheme } from '@mui/material/styles'
@@ -18,6 +21,8 @@ import axios from 'axios'
 import ToggleColorMode from '../ToggleColorMode'
 import { useMutation } from '@tanstack/react-query'
 import BookAndChapterDialog from './components/BookAndChapterDialog'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { getCookie } from '../../utils/helpers'
 
 interface HeaderProps {
   isAdmin: boolean
@@ -25,6 +30,7 @@ interface HeaderProps {
 }
 
 export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
+  const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [bookSelectOpen, setBookSelectOpen] = useState(false)
@@ -32,6 +38,18 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const [error, setError] = useState('')
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('tablet'))
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const isAdminOpen = Boolean(anchorEl)
+
+  const adminName = useMemo(() => {
+    const name = getCookie()
+
+    return name ? capitalize(name) : 'Logout'
+  }, [])
+
+  const handleClose = () => {
+    setAnchorEl(null)
+  }
 
   const loginMutation = useMutation({
     mutationFn: async () => {
@@ -49,8 +67,7 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
       const found = data[name]
       if (found) {
         if (found === password) {
-          document.cookie =
-            'loggedIn=true; expires=Thu, 31 Dec 2099 23:59:59 GMT'
+          document.cookie = `loggedIn=${name}; expires=Thu, 31 Dec 2099 23:59:59 GMT`
           setPassword('')
           setOpen(false)
           setIsAdmin(true)
@@ -63,10 +80,11 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
     },
   })
 
-  const handleClick = () => {
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (isAdmin) {
-      setIsAdmin(false)
-      document.cookie = 'loggedIn=false'
+      setAnchorEl(event.currentTarget)
+      // setIsAdmin(false)
+      // document.cookie = 'loggedIn=false'
     } else {
       setOpen(true)
     }
@@ -90,20 +108,57 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
         <Stack direction="row">
           <ToggleColorMode />
           <Button sx={{ textTransform: 'none', p: 2 }} onClick={handleClick}>
-            {isAdmin ? 'Logout' : 'Login'}
+            {isAdmin ? adminName : 'Login'}
           </Button>
+          <Menu
+            id="basic-menu"
+            anchorEl={anchorEl}
+            open={isAdminOpen}
+            onClose={handleClose}
+            MenuListProps={{
+              'aria-labelledby': 'basic-button',
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                navigate('/edit-lesson')
+                handleClose()
+              }}
+            >
+              Edit lessons
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                navigate('/add-lesson')
+                handleClose()
+              }}
+            >
+              Add new lesson
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                document.cookie = 'loggedIn=false'
+                setIsAdmin(false)
+                handleClose()
+              }}
+            >
+              Logout
+            </MenuItem>
+          </Menu>
         </Stack>
       </Stack>
-      <Typography
-        variant="h1"
+      <Link
+        component={RouterLink}
         sx={{
           textAlign: 'center',
           p: 2,
           fontSize: { mobile: 40, tablet: 64 },
+          textDecoration: 'none',
         }}
+        to="/"
       >
         Sunday School Notes
-      </Typography>
+      </Link>
       <Dialog open={open} onClose={() => setOpen(false)} fullScreen={matches}>
         <DialogTitle
           sx={{ textAlign: 'center', fontSize: { mobile: 30, tablet: 44 } }}

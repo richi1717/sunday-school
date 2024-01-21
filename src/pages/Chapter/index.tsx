@@ -39,14 +39,14 @@ export default function Chapter() {
     () => filterByBook(lessonsData, bookName),
     [lessonsData, bookName],
   )
-  console.log({ filteredByBook })
+  // console.log({ filteredByBook })
 
   const filteredByChapter = useMemo(
     () => filteredByBook[Number(chapter)],
     [filteredByBook, chapter],
   )
 
-  console.log({ filteredByChapter })
+  // console.log({ filteredByChapter })
   const previousAndNextButtonsForChapters = useMemo(
     () => getNextAndPreviousChapter(filteredByBook, chapter),
     [filteredByBook, chapter],
@@ -180,6 +180,7 @@ export default function Chapter() {
     <Stack
       sx={{ p: { mobile: 3, tablet: 5 }, height: 1 }}
       spacing={2}
+      data-testid="chapterPage"
       {...swiperNoSwiping}
     >
       <Stack
@@ -203,7 +204,9 @@ export default function Chapter() {
         </Stack>
       )}
       {filteredByChapter && (
-        <Typography component={MuiMarkdown}>{filteredByChapter}</Typography>
+        <Typography component={MuiMarkdown} sx={{ pb: 5 }}>
+          {filteredByChapter}
+        </Typography>
       )}
     </Stack>
   )

@@ -127,6 +127,13 @@ export const getOrderedListOfBooksFromLessons = (
   currentLessons: CurrentLessons,
 ) => booksOfTheBibleToSort.filter((book) => currentLessons[book])
 
+export const getCookie = () => {
+  const cookieArr = document.cookie.split(';')
+  const found = cookieArr.find((cookie) => cookie.includes('loggedIn'))
+
+  return found?.split('=')[1]
+}
+
 const booksOfTheBibleToSort = [
   'Genesis',
   'Exodus',

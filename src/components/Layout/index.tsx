@@ -3,22 +3,16 @@ import { CircularProgress, Stack } from '@mui/material'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { Outlet } from 'react-router-dom'
 import Header from '../Header'
+import { getCookie } from '../../utils/helpers'
 
 export default function Layout() {
   const [isAdmin, setIsAdmin] = useState(false)
   const { isLoading } = useLessonsQuery()
 
   useEffect(() => {
-    const getCookie = () => {
-      const cookieArr = document.cookie.split(';')
-      const found = cookieArr.find((cookie) => cookie.includes('loggedIn'))
-
-      return found?.split('=')[1]
-    }
-
     const cookie = getCookie()
 
-    setIsAdmin(cookie === 'true')
+    setIsAdmin(!!cookie && cookie !== 'false')
   }, [isAdmin])
 
   if (isLoading)
