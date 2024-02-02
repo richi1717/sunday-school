@@ -43,10 +43,12 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const isAdminOpen = Boolean(anchorEl)
 
   const adminName = useMemo(() => {
-    const name = getCookie()
+    const cookieName = getCookie()
 
-    return name ? capitalize(name) : 'Logout'
-  }, [])
+    return cookieName && cookieName !== 'false'
+      ? capitalize(cookieName)
+      : capitalize(name)
+  }, [name])
 
   const handleClose = () => {
     setAnchorEl(null)
@@ -84,8 +86,6 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     if (isAdmin) {
       setAnchorEl(event.currentTarget)
-      // setIsAdmin(false)
-      // document.cookie = 'loggedIn=false'
     } else {
       setOpen(true)
     }
@@ -151,6 +151,7 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
                 document.cookie = 'loggedIn=false'
                 setIsAdmin(false)
                 handleClose()
+                navigate('/')
               }}
             >
               Logout

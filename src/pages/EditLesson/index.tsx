@@ -1,8 +1,11 @@
 import {
   Alert,
   AlertTitle,
+  FormControl,
+  InputLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Snackbar,
   Stack,
   TextField,
@@ -18,8 +21,11 @@ import editLesson from '../../api/lessons/editLesson'
 import { LoadingButton } from '@mui/lab'
 import { useParams } from 'react-router-dom'
 import addLesson from '../../api/lessons/addLesson'
+import { yupResolver } from '@hookform/resolvers/yup'
+import chaptersPerBook from '../../constants/chaptersPerBook'
+import lessonsSchema from '../../schemas/lessonsSchema'
 
-interface Inputs {
+type Inputs = {
   lesson: string
   chapter: string
   bookName: (typeof booksOfTheBible)[number]
@@ -27,33 +33,72 @@ interface Inputs {
 
 const EditLesson = () => {
   const [open, setOpen] = useState(false)
-  const { bookName = '', chapter = '' } = useParams()
+  const {
+    bookName: bookNameParam = '' as (typeof booksOfTheBible)[number],
+    chapter = '',
+  } = useParams()
   const { data: lessonsData } = useLessonsQuery()
   const queryClient = useQueryClient()
 
-  const lastBook = useMemo(() => {
+  const lastBookAndChapter = useMemo(() => {
     if (lessonsData) {
       const books = getOrderedListOfBooksFromLessons(lessonsData)
+      const lastBook = books[books.length - 1]
+      const chapters = lessonsData[lastBook]
 
-      return books[books.length - 1]
+      return {
+        lastBook,
+        lastChapter: String(chapters.length - 1),
+      }
     }
   }, [lessonsData])
 
   const lesson = useMemo(() => {
     if (lessonsData) {
-      return lessonsData[bookName]?.[chapter]
+      if (bookNameParam && chapter) return lessonsData[bookNameParam]?.[chapter]
+
+      const lastBook = lastBookAndChapter?.lastBook
+      const lastChapter = lastBookAndChapter?.lastChapter
+
+      return (
+        (lastBook && lastChapter && lessonsData[lastBook]?.[lastChapter]) ?? ''
+      )
     }
 
     return ''
-  }, [lessonsData, bookName, chapter])
+  }, [lessonsData, bookNameParam, chapter, lastBookAndChapter])
 
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isDirty, isValid },
     control,
     getValues,
-  } = useForm<Inputs>({ mode: 'onTouched' })
+    watch,
+    setValue,
+  } = useForm<Inputs>({
+    mode: 'onTouched',
+    resolver: yupResolver(lessonsSchema),
+    defaultValues: {
+      bookName:
+        (bookNameParam as (typeof booksOfTheBible)[number]) ||
+        lastBookAndChapter?.lastBook,
+      chapter: chapter || lastBookAndChapter?.lastChapter || '1',
+    },
+  })
+
+  const bookName = watch('bookName') as (typeof booksOfTheBible)[number]
+
+  const chaptersList = useMemo(() => {
+    if (lessonsData) {
+      return Array.from(
+        {
+          length: chaptersPerBook[bookName],
+        },
+        (_, k) => k + 1,
+      )
+    }
+  }, [lessonsData, bookName])
 
   const editLessonMutation = useMutation({
     mutationFn: async (args: Inputs) => {
@@ -89,10 +134,9 @@ const EditLesson = () => {
 
   return (
     <Stack
-      sx={{ p: 5 }}
+      sx={{ p: 5, height: 1, width: 1, overflow: 'auto' }}
       component="form"
       alignItems="center"
-      width={1}
       spacing={2}
       onSubmit={handleSubmit(onSubmit)}
     >
@@ -107,8 +151,7 @@ const EditLesson = () => {
           sx={{ width: 1, '& .MuiAlert-message': { width: 1 } }}
         >
           <AlertTitle>
-            There are no notes for {getValues('bookName')}{' '}
-            {getValues('chapter')}
+            There are no notes for {bookName} {getValues('chapter')}
           </AlertTitle>
           Would you like to add new notes for this chapter instead?
           <Stack
@@ -141,43 +184,77 @@ const EditLesson = () => {
       <Stack spacing={2} width={1}>
         <Controller
           render={({ field }) => (
-            <Select {...field} defaultValue={bookName}>
-              {booksOfTheBible.map((book) => (
-                <MenuItem key={book} value={book}>
-                  {book}
-                </MenuItem>
-              ))}
-            </Select>
+            <FormControl fullWidth>
+              <InputLabel id="book">Book of the Bible</InputLabel>
+              <Select
+                {...field}
+                labelId="book"
+                label="Book of the Bible"
+                onChange={(event: SelectChangeEvent) => {
+                  setValue('chapter', '1')
+                  setValue(
+                    'lesson',
+                    lessonsData[bookName]?.[getValues('chapter')],
+                  )
+
+                  return field.onChange(event)
+                }}
+              >
+                {booksOfTheBible.map((book) => (
+                  <MenuItem key={book} value={book}>
+                    {book}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
           )}
           control={control}
           name="bookName"
-          defaultValue={lastBook}
         />
-        <TextField
-          error={!!errors.chapter}
-          label="Chapter"
-          placeholder="Chapter"
-          helperText={(errors.chapter?.message as string) ?? ''}
-          defaultValue={chapter}
-          {...register('chapter', {
-            required: 'Please add a chapter number',
-          })}
+        <Controller
+          render={({ field }) => (
+            <FormControl fullWidth>
+              <InputLabel id="chapter">Chapter</InputLabel>
+              <Select
+                {...field}
+                label="Chapter"
+                labelId="chapter"
+                onChange={(event: SelectChangeEvent) => {
+                  setValue(
+                    'lesson',
+                    lessonsData[bookName]?.[event.target.value],
+                  )
+
+                  return field.onChange(event)
+                }}
+              >
+                {chaptersList?.map((book) => (
+                  <MenuItem key={book} value={book}>
+                    {book}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          )}
+          control={control}
+          name="chapter"
         />
         <TextField
           error={!!errors.lesson}
           multiline
           minRows={4}
+          defaultValue={lesson}
           label="Your notes"
           helperText={(errors.lesson?.message as string) ?? ''}
-          defaultValue={lesson}
           placeholder="https://www.markdownguide.org/cheat-sheet/ to learn how to use markdown"
-          {...register('lesson', { required: 'Please enter your notes.' })}
+          {...register('lesson')}
         />
         <LoadingButton
           loading={editLessonMutation.isPending}
           type="submit"
           variant="contained"
           sx={{ textTransform: 'none' }}
+          disabled={!isDirty || !isValid}
         >
           Update
         </LoadingButton>

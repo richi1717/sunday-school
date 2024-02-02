@@ -4,6 +4,7 @@ import EditLesson from './pages/EditLesson'
 import { createBrowserRouter } from 'react-router-dom'
 import Chapter from './pages/Chapter'
 import Welcome from './pages/Welcome'
+import ProtectedRoute from './ProtectedRoute'
 
 const Router = createBrowserRouter([
   {
@@ -12,16 +13,21 @@ const Router = createBrowserRouter([
     children: [
       { path: '/', element: <Welcome /> },
       {
-        path: 'add-lesson/',
-        element: <AddLesson />,
-      },
-      {
-        path: 'edit-lesson/',
-        element: <EditLesson />,
+        element: <ProtectedRoute />,
         children: [
           {
-            path: ':bookName/:chapter',
+            path: 'add-lesson/',
+            element: <AddLesson />,
+          },
+          {
+            path: 'edit-lesson/',
             element: <EditLesson />,
+            children: [
+              {
+                path: ':bookName/:chapter',
+                element: <EditLesson />,
+              },
+            ],
           },
         ],
       },

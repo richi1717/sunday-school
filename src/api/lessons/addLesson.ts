@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, update } from 'firebase/database'
+import booksOfTheBible from '../../constants/booksOfTheBible'
 
 const config = {
   appName: 'Sunday Class Notes',
@@ -12,7 +13,7 @@ const app = initializeApp(config)
 const db = getDatabase(app)
 
 interface UpdateLessonsProps {
-  bookName: string
+  bookName: (typeof booksOfTheBible)[number]
   chapter: string
   lesson: string
 }
