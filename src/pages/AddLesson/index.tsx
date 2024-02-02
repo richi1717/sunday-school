@@ -89,8 +89,14 @@ const AddLesson = () => {
             {getValues('chapter')}
           </AlertTitle>
           Please update the book and/or chapter or go to{' '}
-          <Link component={RouterLink} to="/edit-lesson">
-            Edit
+          <Link
+            component={RouterLink}
+            to={`/edit-lesson/${getValues('bookName')}/${getValues('chapter')}`}
+            onClick={() =>
+              queryClient.invalidateQueries({ queryKey: ['lessons'] })
+            }
+          >
+            Edit {getValues('bookName')} {getValues('chapter')}
           </Link>
         </Alert>
       </Snackbar>
