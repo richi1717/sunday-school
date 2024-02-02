@@ -29,6 +29,7 @@ const AddLesson = () => {
   const [open, setOpen] = useState(false)
   const { data: lessonsData } = useLessonsQuery()
   const queryClient = useQueryClient()
+
   const lastBook = useMemo(() => {
     if (lessonsData) {
       const books = getOrderedListOfBooksFromLessons(lessonsData)
@@ -49,6 +50,7 @@ const AddLesson = () => {
     mutationFn: async (args: Inputs) => {
       await addLesson(args)
       queryClient.invalidateQueries({ queryKey: ['lessons'] })
+
       return true
     },
   })

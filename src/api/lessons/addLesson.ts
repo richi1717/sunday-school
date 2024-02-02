@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, update } from 'firebase/database'
-// import NextCors from 'nextjs-cors'
 
 const config = {
   appName: 'Sunday Class Notes',

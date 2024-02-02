@@ -1,6 +1,5 @@
 import { initializeApp } from 'firebase/app'
 import { getDatabase, ref, update } from 'firebase/database'
-// import NextCors from 'nextjs-cors'
 
 const config = {
   appName: 'Sunday Class Notes',
@@ -12,22 +11,12 @@ const config = {
 const app = initializeApp(config)
 const db = getDatabase(app)
 
-interface UpdateLessonsProps {
+interface EditLessonProps {
   bookName: string
   chapter: string
   lesson: string
 }
-const updateLessons = async ({
-  bookName,
-  chapter,
-  lesson,
-}: UpdateLessonsProps) => {
-  // await NextCors(req, res, {
-  //   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
-  //   origin: '*',
-  //   optionsSuccessStatus: 200,
-  // })
-
+const editLesson = async ({ bookName, chapter, lesson }: EditLessonProps) => {
   await update(ref(db, `studies/${bookName}`), {
     [chapter]: lesson,
   })
@@ -35,4 +24,4 @@ const updateLessons = async ({
   console.log('looks like we made it!')
 }
 
-export default updateLessons
+export default editLesson

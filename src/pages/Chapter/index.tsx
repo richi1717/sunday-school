@@ -1,23 +1,9 @@
-import {
-  // Accordion,
-  // AccordionDetails,
-  // AccordionSummary,
-  Box,
-  Button,
-  // CircularProgress,
-  // IconButton,
-  Stack,
-  Typography,
-} from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import EngineeringIcon from '@mui/icons-material/Engineering'
-// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useCallback, useMemo } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
-// import EditIcon from '@mui/icons-material/Edit'
-// import DeleteForeverIcon from '@mui/icons-material/DeleteForever'
 import {
   filterByBook,
-  // getLastBook,
   getNextAndPreviousBooks,
   getNextAndPreviousChapter,
   lastChapterOfPreviousBook,
@@ -26,27 +12,20 @@ import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import useSwipe from '../../utils/useSwipe'
 
-export default function Chapter() {
+function Chapter() {
   const navigate = useNavigate()
   const { bookName = '', chapter = '' } = useParams()
-  // console.log({ bookName, chapter })
-  // const inputEl = useRef<HTMLInputElement>(null)
-  // const [lesson, setLesson] = useState('')
-  // const [updateId, setUpdateId] = useState('')
   const { data: lessonsData } = useLessonsQuery()
-  // console.log({ lessonsData })
   const filteredByBook = useMemo(
     () => filterByBook(lessonsData, bookName),
     [lessonsData, bookName],
   )
-  // console.log({ filteredByBook })
 
   const filteredByChapter = useMemo(
     () => filteredByBook[Number(chapter)],
     [filteredByBook, chapter],
   )
 
-  // console.log({ filteredByChapter })
   const previousAndNextButtonsForChapters = useMemo(
     () => getNextAndPreviousChapter(filteredByBook, chapter),
     [filteredByBook, chapter],
@@ -96,40 +75,6 @@ export default function Chapter() {
     onSwipedLeft,
     onSwipedRight,
   })
-  // console.log({
-  //   previousAndNextButtonsForChapters,
-  //   previousAndNextButtonsForBooks,
-  // })
-  // const lastIndex = useMemo(() => filteredByBook?.length - 1, [filteredByBook])
-
-  // const lastSubIndex = useMemo(() => filterByBook(currentLessons, bookName)?.length - 1, [currentLessons])
-  // console.log(lastIndex, filteredByBook)
-  // const expandedDefault = filteredByBook?.[lastIndex]?.book
-  // const [expanded, setExpanded] = useState<boolean | string>(expandedDefault)
-  // const [subExpanded, setSubExpanded] = useState<boolean | string>(
-  //   expandedDefault,
-  // )
-  // console.log({ expandedDefault, lesson, updateId, lastOne: getLastBook() })
-
-  // const deleteLessons = async (book: string, chapter: string) => {
-  //   console.log(book, chapter)
-  //   try {
-  //     // await fetch('/api/deleteLessons', {
-  //     //   method: 'POST',
-  //     //   body: JSON.stringify({
-  //     //     id,
-  //     //   }),
-  //     // })
-  //     // const temp = await (
-  //     //   await fetch(`${import.meta.env.VITE_DB_URL}/studies.json`)
-  //     // ).json()
-  //     // setCurrentLessons(temp)
-  //     setCurrentLessons({})
-  //   } catch (err) {
-  //     console.error(err)
-  //   }
-  //   setUpdateId('')
-  // }
 
   const renderPreviousAndNextButton = (next: boolean) => {
     if (previousAndNextButtonsForChapters[next ? 'next' : 'previous']) {
@@ -211,3 +156,5 @@ export default function Chapter() {
     </Stack>
   )
 }
+
+export default Chapter

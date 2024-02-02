@@ -21,7 +21,7 @@ import axios from 'axios'
 import ToggleColorMode from '../ToggleColorMode'
 import { useMutation } from '@tanstack/react-query'
 import BookAndChapterDialog from './components/BookAndChapterDialog'
-import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
 import { getCookie } from '../../utils/helpers'
 
 interface HeaderProps {
@@ -31,6 +31,7 @@ interface HeaderProps {
 
 export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const navigate = useNavigate()
+  const { bookName = '', chapter = '' } = useParams()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
   const [bookSelectOpen, setBookSelectOpen] = useState(false)
@@ -127,6 +128,16 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
             >
               Edit lessons
             </MenuItem>
+            {bookName && chapter && (
+              <MenuItem
+                onClick={() => {
+                  navigate(`/edit-lesson/${bookName}/${chapter}`)
+                  handleClose()
+                }}
+              >
+                Edit {bookName} {chapter}
+              </MenuItem>
+            )}
             <MenuItem
               onClick={() => {
                 navigate('/add-lesson')

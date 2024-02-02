@@ -3,7 +3,6 @@ import AddLesson from './pages/AddLesson'
 import EditLesson from './pages/EditLesson'
 import { createBrowserRouter } from 'react-router-dom'
 import Chapter from './pages/Chapter'
-// import Lessons from './pages/Lessons'
 import Welcome from './pages/Welcome'
 
 const Router = createBrowserRouter([
@@ -19,6 +18,12 @@ const Router = createBrowserRouter([
       {
         path: 'edit-lesson/',
         element: <EditLesson />,
+        children: [
+          {
+            path: ':bookName/:chapter',
+            element: <EditLesson />,
+          },
+        ],
       },
       {
         path: ':bookName/:chapter',
