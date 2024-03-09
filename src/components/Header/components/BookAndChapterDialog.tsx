@@ -61,7 +61,8 @@ export default function BookAndChapterDialog({
               key={book}
               TransitionProps={{ unmountOnExit: true }}
               defaultExpanded={
-                bookName === book || idx + 1 === orderedLessons.length
+                bookName === book ||
+                (!bookName && idx + 1 === orderedLessons.length)
               }
             >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
