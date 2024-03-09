@@ -30,7 +30,7 @@ export default function Welcome() {
   return (
     <Stack
       alignItems="center"
-      sx={{ p: 5 }}
+      sx={{ p: 5, maxWidth: 'desktop' }}
       spacing={2}
       data-testid="welcomePage"
     >

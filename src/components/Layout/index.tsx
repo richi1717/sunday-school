@@ -23,7 +23,7 @@ export default function Layout() {
     )
 
   return (
-    <Stack height={1}>
+    <Stack height={1} alignItems="center">
       <Header isAdmin={isAdmin} setIsAdmin={setIsAdmin} />
       <Outlet />
     </Stack>
