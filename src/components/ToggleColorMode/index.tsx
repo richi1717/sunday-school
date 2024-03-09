@@ -1,18 +1,17 @@
 import * as React from 'react'
-import IconButton from '@mui/material/IconButton'
-import Box from '@mui/material/Box'
-import { useTheme } from '@mui/material/styles'
+import IconButton from '@mui/joy/IconButton'
+import Box from '@mui/joy/Box'
 import Brightness4Icon from '@mui/icons-material/Brightness4'
 import Brightness7Icon from '@mui/icons-material/Brightness7'
-import { Tooltip } from '@mui/material'
+import { Tooltip } from '@mui/joy'
+import { useColorScheme } from '@mui/joy/styles'
 
 export const ColorModeContext = React.createContext({
   toggleColorMode: () => {},
 })
 
 function ToggleColorMode() {
-  const theme = useTheme()
-  const colorMode = React.useContext(ColorModeContext)
+  const { mode, setMode } = useColorScheme()
 
   return (
     <Box
@@ -25,21 +24,12 @@ function ToggleColorMode() {
         borderRadius: 1,
       }}
     >
-      <Tooltip
-        title={
-          theme.palette.mode === 'dark' ? 'use light mode' : 'use dark mode'
-        }
-      >
+      <Tooltip title={mode === 'dark' ? 'use light mode' : 'use dark mode'}>
         <IconButton
           sx={{ ml: 1 }}
-          onClick={colorMode.toggleColorMode}
-          color="inherit"
+          onClick={() => setMode(mode === 'dark' ? 'light' : 'dark')}
         >
-          {theme.palette.mode === 'dark' ? (
-            <Brightness7Icon />
-          ) : (
-            <Brightness4Icon />
-          )}
+          {mode === 'dark' ? <Brightness7Icon /> : <Brightness4Icon />}
         </IconButton>
       </Tooltip>
     </Box>

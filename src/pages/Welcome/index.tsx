@@ -1,4 +1,4 @@
-import { Link, Stack, Typography } from '@mui/material'
+import { Link, Stack, Typography } from '@mui/joy'
 import { Link as RouterLink } from 'react-router-dom'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { useMemo } from 'react'
@@ -34,7 +34,7 @@ export default function Welcome() {
       spacing={2}
       data-testid="welcomePage"
     >
-      <Typography variant="h1" sx={{ fontSize: { mobile: 24, tablet: 32 } }}>
+      <Typography level="h1" sx={{ fontSize: { mobile: 24, tablet: 32 } }}>
         Welcome to Family Life Church of Dora's Sunday school class.
       </Typography>
       <Typography sx={{ fontSize: { mobile: 16, tablet: 20 } }}>
@@ -51,11 +51,7 @@ export default function Welcome() {
           {bookAndChapterURL?.lastBook} {bookAndChapterURL?.lastChapter}
         </Link>
         ), or visit the first chapter that we saved our notes on (
-        <Link
-          component={RouterLink}
-          to={`/${bookAndChapterURL?.first}`}
-          sx={{ textDecoration: 'none' }}
-        >
+        <Link component={RouterLink} to={`/${bookAndChapterURL?.first}`}>
           {bookAndChapterURL?.firstBook} {bookAndChapterURL?.firstChapter}
         </Link>
         ).

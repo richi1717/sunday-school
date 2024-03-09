@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { CircularProgress, Stack } from '@mui/material'
+import { CircularProgress, Stack } from '@mui/joy'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { Outlet } from 'react-router-dom'
 import Header from '../Header'

@@ -1,20 +1,24 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import { capitalize } from '@mui/material'
 import {
   Alert,
   Button,
-  Dialog,
+  Modal,
   DialogActions,
   DialogContent,
   DialogTitle,
-  IconButton,
   Link,
-  Menu,
+  Dropdown,
   MenuItem,
   Stack,
-  TextField,
-  capitalize,
-} from '@mui/material'
-import CloseIcon from '@mui/icons-material/Close'
+  Input,
+  Menu,
+  ModalDialog,
+  ModalClose,
+  MenuButton,
+  FormControl,
+  FormLabel,
+} from '@mui/joy'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import axios from 'axios'
@@ -34,13 +38,12 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const { bookName = '', chapter = '' } = useParams()
   const [open, setOpen] = useState(false)
   const [name, setName] = useState('')
+  const [isAdminOpen, setIsAdminOpen] = useState(false)
   const [bookSelectOpen, setBookSelectOpen] = useState(false)
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('tablet'))
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const isAdminOpen = Boolean(anchorEl)
 
   const adminName = useMemo(() => {
     const cookieName = getCookie()
@@ -49,10 +52,6 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
       ? capitalize(cookieName)
       : capitalize(name)
   }, [name])
-
-  const handleClose = () => {
-    setAnchorEl(null)
-  }
 
   const loginMutation = useMutation({
     mutationFn: async () => {
@@ -83,84 +82,86 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
     },
   })
 
-  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    if (isAdmin) {
-      setAnchorEl(event.currentTarget)
-    } else {
-      setOpen(true)
-    }
-  }
+  const handleClick = useCallback(
+    (_: React.SyntheticEvent | null, isOpen: boolean) => {
+      if (isAdmin) {
+        setIsAdminOpen(isOpen)
+      } else {
+        setOpen(isOpen)
+      }
+    },
+    [isAdmin],
+  )
 
   return (
     <Stack
       direction="column"
       justifyContent="space-between"
       alignItems="center"
-      p={2}
     >
-      <Stack direction="row" justifyContent="space-between" width={1}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        width={1}
+        sx={{ background: (theme) => theme.palette.primary[400] }}
+      >
         <Button
           sx={{ textTransform: 'none', p: 2 }}
           onClick={() => setBookSelectOpen(true)}
+          variant="plain"
         >
           Book & Chapter
         </Button>
-
-        <Stack direction="row">
+        <Stack direction="row" p={2}>
           <ToggleColorMode />
-          <Button sx={{ textTransform: 'none', p: 2 }} onClick={handleClick}>
-            {isAdmin ? adminName : 'Login'}
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={isAdminOpen}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                navigate('/edit-lesson')
-                handleClose()
-              }}
-            >
-              Edit lessons
-            </MenuItem>
-            {bookName && chapter && (
+          <Dropdown open={isAdminOpen} onOpenChange={handleClick}>
+            <MenuButton variant="plain">
+              {isAdmin ? adminName : 'Login'}
+            </MenuButton>
+            <Menu variant="soft">
               <MenuItem
                 onClick={() => {
-                  navigate(`/edit-lesson/${bookName}/${chapter}`)
-                  handleClose()
+                  navigate('/edit-lesson')
+                  setIsAdminOpen(false)
                 }}
               >
-                Edit {bookName} {chapter}
+                Edit lessons
               </MenuItem>
-            )}
-            <MenuItem
-              onClick={() => {
-                navigate('/add-lesson')
-                handleClose()
-              }}
-            >
-              Add new lesson
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                document.cookie = 'loggedIn=false'
-                setIsAdmin(false)
-                handleClose()
-                navigate('/')
-              }}
-            >
-              Logout
-            </MenuItem>
-          </Menu>
+              {bookName && chapter && (
+                <MenuItem
+                  onClick={() => {
+                    navigate(`/edit-lesson/${bookName}/${chapter}`)
+                    setIsAdminOpen(false)
+                  }}
+                >
+                  Edit {bookName} {chapter}
+                </MenuItem>
+              )}
+              <MenuItem
+                onClick={() => {
+                  navigate('/add-lesson')
+                  setIsAdminOpen(false)
+                }}
+              >
+                Add new lesson
+              </MenuItem>
+              <MenuItem
+                onClick={() => {
+                  document.cookie = 'loggedIn=false'
+                  setIsAdmin(false)
+                  setIsAdminOpen(false)
+                  navigate('/')
+                }}
+              >
+                Logout
+              </MenuItem>
+            </Menu>
+          </Dropdown>
         </Stack>
       </Stack>
       <Link
         component={RouterLink}
+        level="h1"
         sx={{
           textAlign: 'center',
           p: 2,
@@ -171,60 +172,58 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
       >
         Sunday School Notes
       </Link>
-      <Dialog open={open} onClose={() => setOpen(false)} fullScreen={matches}>
-        <DialogTitle
-          sx={{ textAlign: 'center', fontSize: { mobile: 30, tablet: 44 } }}
-        >
-          Login to edit
-          <IconButton
-            aria-label="close"
-            onClick={() => setOpen(false)}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}
+      <Modal open={open} onClose={() => setOpen(false)}>
+        <ModalDialog layout="center">
+          <DialogTitle
+            sx={{ textAlign: 'center', fontSize: { mobile: 30, tablet: 44 } }}
           >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-        {error && (
-          <Alert severity="error" sx={{ mx: 3 }}>
-            {error}
-          </Alert>
-        )}
-        <DialogContent>
-          <Stack
-            sx={{ minWidth: { mobile: 1, tablet: 400 }, pt: 1 }}
-            spacing={2}
-            component="form"
-            onSubmit={(e) => {
-              e.preventDefault()
-              loginMutation.mutate()
-            }}
-          >
-            <TextField
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              label="Name"
-            />
-            <TextField
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              label="Password"
-            />
-            <DialogActions sx={{ p: 0 }}>
-              <Button
-                type="submit"
-                sx={{ textTransform: 'none', width: 1 }}
-                variant="contained"
-              >
-                Login
-              </Button>
-            </DialogActions>
-          </Stack>
-        </DialogContent>
-      </Dialog>
+            Login to edit
+            <ModalClose />
+          </DialogTitle>
+          {error && (
+            <Alert color="danger" sx={{ mx: 3 }}>
+              {error}
+            </Alert>
+          )}
+          <DialogContent>
+            <Stack
+              sx={{ minWidth: { mobile: 1, tablet: 400 }, pt: 1 }}
+              spacing={2}
+              component="form"
+              onSubmit={(e) => {
+                e.preventDefault()
+                loginMutation.mutate()
+              }}
+            >
+              <FormControl>
+                <FormLabel>Name</FormLabel>
+                <Input
+                  variant="soft"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </FormControl>
+              <FormControl>
+                <FormLabel>Password</FormLabel>
+                <Input
+                  variant="soft"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </FormControl>
+              <DialogActions sx={{ p: 0 }}>
+                <Button
+                  type="submit"
+                  sx={{ textTransform: 'none', width: 1 }}
+                  variant="soft"
+                >
+                  Login
+                </Button>
+              </DialogActions>
+            </Stack>
+          </DialogContent>
+        </ModalDialog>
+      </Modal>
       <BookAndChapterDialog
         open={bookSelectOpen}
         closeDialog={() => setBookSelectOpen(false)}
