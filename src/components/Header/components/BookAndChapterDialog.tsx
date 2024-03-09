@@ -10,7 +10,7 @@ import {
   Stack,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useLessonsQuery } from '../../../api/lessons/getLessons'
 import { useMemo } from 'react'
@@ -32,6 +32,7 @@ export default function BookAndChapterDialog({
   fullScreen = false,
 }: BookAndChapterDialogProps) {
   const { data: lessonsData } = useLessonsQuery()
+  const { bookName = '' } = useParams()
 
   const orderedLessons = useMemo(
     () => getOrderedListOfBooksFromLessons(lessonsData),
@@ -55,8 +56,14 @@ export default function BookAndChapterDialog({
       </DialogTitle>
       <DialogContent sx={{ mt: 3 }}>
         <Stack sx={{ width: { mobile: 1, tablet: 500 } }} spacing={2}>
-          {orderedLessons.map((book) => (
-            <Accordion key={book} TransitionProps={{ unmountOnExit: true }}>
+          {orderedLessons.map((book, idx) => (
+            <Accordion
+              key={book}
+              TransitionProps={{ unmountOnExit: true }}
+              defaultExpanded={
+                bookName === book || idx + 1 === orderedLessons.length
+              }
+            >
               <AccordionSummary expandIcon={<ExpandMoreIcon />}>
                 {book}
               </AccordionSummary>

@@ -1,11 +1,13 @@
 import React from 'react'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { CssBaseline, Stack, useMediaQuery } from '@mui/material'
-import ThemeProvider from '@mui/material/styles/ThemeProvider'
+import CssBaseline from '@mui/material/CssBaseline'
+import { ThemeProvider } from '@mui/material/styles'
+import { Stack, useMediaQuery } from '@mui/material'
 import myTheme from './theme'
 import { ColorModeContext } from './components/ToggleColorMode'
 import { RouterProvider } from 'react-router-dom'
 import Router from './Router'
+import '@fontsource/inter'
 
 const queryClient = new QueryClient()
 

@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react'
 import {
   Alert,
+  AppBar,
+  Box,
   Button,
+  Container,
   Dialog,
   DialogActions,
   DialogContent,
@@ -12,6 +15,7 @@ import {
   MenuItem,
   Stack,
   TextField,
+  Toolbar,
   capitalize,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
@@ -96,69 +100,77 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
       direction="column"
       justifyContent="space-between"
       alignItems="center"
-      p={2}
+      mt={12}
     >
-      <Stack direction="row" justifyContent="space-between" width={1}>
-        <Button
-          sx={{ textTransform: 'none', p: 2 }}
-          onClick={() => setBookSelectOpen(true)}
-        >
-          Book & Chapter
-        </Button>
-
-        <Stack direction="row">
-          <ToggleColorMode />
-          <Button sx={{ textTransform: 'none', p: 2 }} onClick={handleClick}>
-            {isAdmin ? adminName : 'Login'}
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={isAdminOpen}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-          >
-            <MenuItem
-              onClick={() => {
-                navigate('/edit-lesson')
-                handleClose()
-              }}
-            >
-              Edit lessons
-            </MenuItem>
-            {bookName && chapter && (
-              <MenuItem
-                onClick={() => {
-                  navigate(`/edit-lesson/${bookName}/${chapter}`)
-                  handleClose()
+      <AppBar position="fixed">
+        <Container>
+          <Toolbar disableGutters>
+            <Box sx={{ flexGrow: 1 }}>
+              <Button
+                sx={{ textTransform: 'none', p: 2, color: 'common.white' }}
+                onClick={() => setBookSelectOpen(true)}
+              >
+                Book & Chapter
+              </Button>
+            </Box>
+            <Stack direction="row" p={2} flexGrow={0}>
+              <ToggleColorMode />
+              <Button
+                sx={{ textTransform: 'none', p: 2, color: 'common.white' }}
+                onClick={handleClick}
+              >
+                {isAdmin ? adminName : 'Login'}
+              </Button>
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={isAdminOpen}
+                onClose={handleClose}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
                 }}
               >
-                Edit {bookName} {chapter}
-              </MenuItem>
-            )}
-            <MenuItem
-              onClick={() => {
-                navigate('/add-lesson')
-                handleClose()
-              }}
-            >
-              Add new lesson
-            </MenuItem>
-            <MenuItem
-              onClick={() => {
-                document.cookie = 'loggedIn=false'
-                setIsAdmin(false)
-                handleClose()
-                navigate('/')
-              }}
-            >
-              Logout
-            </MenuItem>
-          </Menu>
-        </Stack>
-      </Stack>
+                <MenuItem
+                  onClick={() => {
+                    navigate('/edit-lesson')
+                    handleClose()
+                  }}
+                >
+                  Edit lessons
+                </MenuItem>
+                {bookName && chapter && (
+                  <MenuItem
+                    onClick={() => {
+                      navigate(`/edit-lesson/${bookName}/${chapter}`)
+                      handleClose()
+                    }}
+                  >
+                    Edit {bookName} {chapter}
+                  </MenuItem>
+                )}
+                <MenuItem
+                  onClick={() => {
+                    navigate('/add-lesson')
+                    handleClose()
+                  }}
+                >
+                  Add new lesson
+                </MenuItem>
+                <MenuItem
+                  onClick={() => {
+                    document.cookie = 'loggedIn=false'
+                    setIsAdmin(false)
+                    handleClose()
+                    navigate('/')
+                  }}
+                >
+                  Logout
+                </MenuItem>
+              </Menu>
+            </Stack>
+          </Toolbar>
+        </Container>
+      </AppBar>
       <Link
         component={RouterLink}
         sx={{
@@ -225,11 +237,13 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
           </Stack>
         </DialogContent>
       </Dialog>
-      <BookAndChapterDialog
-        open={bookSelectOpen}
-        closeDialog={() => setBookSelectOpen(false)}
-        fullScreen={matches}
-      />
+      {bookSelectOpen && (
+        <BookAndChapterDialog
+          open={bookSelectOpen}
+          closeDialog={() => setBookSelectOpen(false)}
+          fullScreen={matches}
+        />
+      )}
     </Stack>
   )
 }

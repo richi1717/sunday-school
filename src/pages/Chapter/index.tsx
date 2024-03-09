@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Typography } from '@mui/material'
+import { Box, Button, Card, Stack, Typography } from '@mui/material'
 import EngineeringIcon from '@mui/icons-material/Engineering'
 import { useCallback, useMemo } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
@@ -123,36 +123,62 @@ function Chapter() {
 
   return (
     <Stack
-      sx={{ p: { mobile: 3, tablet: 5 }, height: 1 }}
-      spacing={2}
-      data-testid="chapterPage"
-      {...swiperNoSwiping}
+      sx={{
+        p: { mobile: 0, tablet: 4 },
+        alignItems: 'center',
+        overflow: 'hidden',
+      }}
     >
       <Stack
-        direction="column"
-        justifyContent="space-between"
-        alignItems="center"
-        spacing={2}
+        sx={{
+          overflow: 'hidden',
+        }}
       >
-        <Typography variant="h1" sx={{ fontSize: { mobile: 16, tablet: 24 } }}>
-          {bookName} {chapter}
-        </Typography>
-        <Stack direction="row" justifyContent="space-between" width={1}>
-          {renderPreviousAndNextButton(false)}
-          {renderPreviousAndNextButton(true)}
-        </Stack>
+        <Card
+          sx={{
+            p: { mobile: 0, tablet: 4 },
+            overflowY: 'scroll',
+            maxHeight: 'calc(70vh)',
+            maxWidth: 'desktop',
+          }}
+        >
+          <Stack
+            sx={{ p: { mobile: 3, tablet: 5 }, height: 1 }}
+            spacing={2}
+            data-testid="chapterPage"
+            {...swiperNoSwiping}
+          >
+            <Stack
+              direction="column"
+              justifyContent="space-between"
+              alignItems="center"
+              spacing={2}
+            >
+              <Typography
+                variant="h1"
+                sx={{ fontSize: { mobile: 16, tablet: 24 } }}
+              >
+                {bookName} {chapter}
+              </Typography>
+              <Stack direction="row" justifyContent="space-between" width={1}>
+                {renderPreviousAndNextButton(false)}
+                {renderPreviousAndNextButton(true)}
+              </Stack>
+            </Stack>
+            {filteredByBook.length === 0 && (
+              <Stack alignItems="center" direction="column" spacing={4}>
+                <Typography fontSize={32}>Coming soon</Typography>
+                <EngineeringIcon sx={{ height: 100, width: 100 }} />
+              </Stack>
+            )}
+            {filteredByChapter && (
+              <Typography component={MuiMarkdown} sx={{ pb: 5 }}>
+                {filteredByChapter}
+              </Typography>
+            )}
+          </Stack>
+        </Card>
       </Stack>
-      {filteredByBook.length === 0 && (
-        <Stack alignItems="center" direction="column" spacing={4}>
-          <Typography fontSize={32}>Coming soon</Typography>
-          <EngineeringIcon sx={{ height: 100, width: 100 }} />
-        </Stack>
-      )}
-      {filteredByChapter && (
-        <Typography component={MuiMarkdown} sx={{ pb: 5 }}>
-          {filteredByChapter}
-        </Typography>
-      )}
     </Stack>
   )
 }

@@ -16,20 +16,35 @@ declare module '@mui/material/styles' {
 
 export default (mode: 'dark' | 'light' = 'dark') =>
   createTheme({
+    typography: {
+      fontFamily: [
+        '-apple-system',
+        'Inter',
+        '"Segoe UI"',
+        'Roboto',
+        '"Helvetica Neue"',
+        'Arial',
+        'sans-serif',
+        '"Apple Color Emoji"',
+        '"Segoe UI Emoji"',
+        '"Segoe UI Symbol"',
+      ].join(','),
+    },
     palette: {
       mode,
       ...(mode === 'dark'
         ? {
             background: {
-              default: 'rgb(0, 30, 60)',
-              paper: 'rgb(0, 30, 60)',
+              default: '#0f1418',
             },
             text: {
               primary: 'rgb(255, 255, 255)',
               secondary: grey[500],
             },
+            primary: { main: '#6e43a3' },
           }
         : {
+            primary: { main: '#410060' },
             background: {
               default: grey[100],
               paper: grey[100],
