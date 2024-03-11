@@ -127,44 +127,48 @@ function Chapter() {
         p: { mobile: 0, tablet: 4 },
         alignItems: 'center',
         overflow: 'hidden',
+        width: 1,
       }}
     >
       <Stack
         sx={{
           overflow: 'hidden',
+          maxWidth: 'desktop',
+          width: 1,
         }}
       >
-        <Card
-          sx={{
-            p: { mobile: 0, tablet: 4 },
-            overflowY: 'scroll',
-            maxHeight: 'calc(70vh)',
-            maxWidth: 'desktop',
-          }}
+        <Stack
+          sx={{ height: 1, width: 1 }}
+          spacing={2}
+          data-testid="chapterPage"
+          {...swiperNoSwiping}
         >
           <Stack
-            sx={{ p: { mobile: 3, tablet: 5 }, height: 1 }}
+            direction="column"
+            justifyContent="space-between"
+            alignItems="center"
             spacing={2}
-            data-testid="chapterPage"
-            {...swiperNoSwiping}
           >
-            <Stack
-              direction="column"
-              justifyContent="space-between"
-              alignItems="center"
-              spacing={2}
+            <Typography
+              variant="h1"
+              sx={{ fontSize: { mobile: 16, tablet: 24 } }}
             >
-              <Typography
-                variant="h1"
-                sx={{ fontSize: { mobile: 16, tablet: 24 } }}
-              >
-                {bookName} {chapter}
-              </Typography>
-              <Stack direction="row" justifyContent="space-between" width={1}>
-                {renderPreviousAndNextButton(false)}
-                {renderPreviousAndNextButton(true)}
-              </Stack>
+              {bookName} {chapter}
+            </Typography>
+            <Stack direction="row" justifyContent="space-between" width={1}>
+              {renderPreviousAndNextButton(false)}
+              {renderPreviousAndNextButton(true)}
             </Stack>
+          </Stack>
+          <Card
+            sx={{
+              p: { mobile: 3, tablet: 5 },
+              overflowY: 'scroll',
+              maxHeight: 'calc(70vh)',
+              maxWidth: 'desktop',
+              width: 1,
+            }}
+          >
             {filteredByBook.length === 0 && (
               <Stack alignItems="center" direction="column" spacing={4}>
                 <Typography fontSize={32}>Coming soon</Typography>
@@ -172,12 +176,15 @@ function Chapter() {
               </Stack>
             )}
             {filteredByChapter && (
-              <Typography component={MuiMarkdown} sx={{ pb: 5 }}>
+              <Typography
+                component={MuiMarkdown}
+                sx={{ pb: 5, maxWidth: 1, '& a': { wordBreak: 'break-all' } }}
+              >
                 {filteredByChapter}
               </Typography>
             )}
-          </Stack>
-        </Card>
+          </Card>
+        </Stack>
       </Stack>
     </Stack>
   )
