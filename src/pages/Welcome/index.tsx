@@ -30,10 +30,24 @@ export default function Welcome() {
   return (
     <Stack
       alignItems="center"
-      sx={{ p: 5, maxWidth: 'desktop' }}
+      sx={{
+        py: { mobile: 1, tablet: 4 },
+        px: { mobile: 3, tablet: 4 },
+        maxWidth: 'desktop',
+      }}
       spacing={2}
       data-testid="welcomePage"
     >
+      <Typography
+        sx={{
+          textAlign: 'center',
+          p: 2,
+          fontSize: { mobile: 28, tablet: 64 },
+          color: 'primary.main',
+        }}
+      >
+        Sunday School Notes
+      </Typography>
       <Typography variant="h1" sx={{ fontSize: { mobile: 24, tablet: 32 } }}>
         Welcome to Family Life Church of Dora's Sunday school class.
       </Typography>

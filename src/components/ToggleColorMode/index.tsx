@@ -1,48 +1,51 @@
 import * as React from 'react'
-import IconButton from '@mui/material/IconButton'
-import Box from '@mui/material/Box'
-import { useTheme } from '@mui/material/styles'
-import Brightness4Icon from '@mui/icons-material/Brightness4'
-import Brightness7Icon from '@mui/icons-material/Brightness7'
-import { Tooltip } from '@mui/material'
+import { ToggleButton, ToggleButtonGroup } from '@mui/material'
+import SettingsBrightnessIcon from '@mui/icons-material/SettingsBrightness'
+import LightModeIcon from '@mui/icons-material/LightMode'
+import DarkModeIcon from '@mui/icons-material/DarkMode'
 
-export const ColorModeContext = React.createContext({
-  toggleColorMode: () => {},
-})
+export type Mode = 'dark' | 'light' | 'system'
+
+type ColorModeContextProps = {
+  mode: Mode
+  setColorMode: (mode: Mode) => void
+}
+
+export const ColorModeContext = React.createContext<ColorModeContextProps>(
+  {} as ColorModeContextProps,
+)
 
 function ToggleColorMode() {
-  const theme = useTheme()
-  const colorMode = React.useContext(ColorModeContext)
+  const { mode, setColorMode } = React.useContext(ColorModeContext)
+
+  const handleChange = (
+    _: React.MouseEvent<HTMLElement>,
+    newMode: 'light' | 'dark' | 'system',
+  ) => {
+    newMode && setColorMode(newMode)
+  }
 
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        width: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: 'text.primary',
-        borderRadius: 1,
-      }}
+    <ToggleButtonGroup
+      color="primary"
+      value={mode}
+      exclusive
+      onChange={handleChange}
+      aria-label="Platform"
     >
-      <Tooltip
-        title={
-          theme.palette.mode === 'dark' ? 'use light mode' : 'use dark mode'
-        }
-      >
-        <IconButton
-          sx={{ ml: 1 }}
-          onClick={colorMode.toggleColorMode}
-          color="inherit"
-        >
-          {theme.palette.mode === 'dark' ? (
-            <Brightness7Icon />
-          ) : (
-            <Brightness4Icon />
-          )}
-        </IconButton>
-      </Tooltip>
-    </Box>
+      <ToggleButton value="light" sx={{ textTransform: 'none' }}>
+        <LightModeIcon sx={{ mr: 1 }} />
+        Light
+      </ToggleButton>
+      <ToggleButton value="system" sx={{ textTransform: 'none' }}>
+        <SettingsBrightnessIcon sx={{ mr: 1 }} />
+        System
+      </ToggleButton>
+      <ToggleButton value="dark" sx={{ textTransform: 'none' }}>
+        <DarkModeIcon sx={{ mr: 1 }} />
+        Dark
+      </ToggleButton>
+    </ToggleButtonGroup>
   )
 }
 

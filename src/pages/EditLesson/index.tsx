@@ -134,7 +134,12 @@ const EditLesson = () => {
 
   return (
     <Stack
-      sx={{ p: 5, height: 1, width: 1, overflow: 'auto' }}
+      sx={{
+        py: { mobile: 1, tablet: 4 },
+        px: { mobile: 3, tablet: 4 },
+        width: 1,
+        maxWidth: 'desktop',
+      }}
       component="form"
       alignItems="center"
       spacing={2}
@@ -243,6 +248,7 @@ const EditLesson = () => {
           error={!!errors.lesson}
           multiline
           minRows={4}
+          maxRows={35}
           defaultValue={lesson}
           label="Your notes"
           helperText={(errors.lesson?.message as string) ?? ''}

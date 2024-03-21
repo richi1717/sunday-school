@@ -98,7 +98,11 @@ const AddLesson = () => {
 
   return (
     <Stack
-      sx={{ p: 5 }}
+      sx={{
+        py: { mobile: 1, tablet: 4 },
+        px: { mobile: 3, tablet: 4 },
+        maxWidth: 'desktop',
+      }}
       component="form"
       alignItems="center"
       width={1}
@@ -170,6 +174,7 @@ const AddLesson = () => {
           error={!!errors.lesson}
           multiline
           minRows={4}
+          maxRows={35}
           label="Your notes"
           helperText={(errors.lesson?.message as string) ?? ''}
           placeholder="https://www.markdownguide.org/cheat-sheet/ to learn how to use markdown"

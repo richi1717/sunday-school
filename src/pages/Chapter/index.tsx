@@ -1,4 +1,14 @@
-import { Box, Button, Card, Stack, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  Stack,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from '@mui/material'
+import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined'
+import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined'
 import EngineeringIcon from '@mui/icons-material/Engineering'
 import { useCallback, useMemo } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
@@ -16,6 +26,9 @@ function Chapter() {
   const navigate = useNavigate()
   const { bookName = '', chapter = '' } = useParams()
   const { data: lessonsData } = useLessonsQuery()
+  const theme = useTheme()
+  const matches = useMediaQuery(theme.breakpoints.up('tablet'))
+
   const filteredByBook = useMemo(
     () => filterByBook(lessonsData, bookName),
     [lessonsData, bookName],
@@ -78,19 +91,30 @@ function Chapter() {
 
   const renderPreviousAndNextButton = (next: boolean) => {
     if (previousAndNextButtonsForChapters[next ? 'next' : 'previous']) {
+      const text = previousAndNextButtonsForChapters[next ? 'next' : 'previous']
+      const arrows = next ? (
+        <ArrowCircleRightOutlinedIcon />
+      ) : (
+        <ArrowCircleLeftOutlinedIcon />
+      )
+
       return (
         <Button
           component={Link}
           to={`/${bookName}/${
             previousAndNextButtonsForChapters[next ? 'next' : 'previous']
           }`}
-          variant="contained"
+          variant={matches ? 'contained' : 'text'}
           sx={{
             textTransform: 'none',
-            width: 146,
+            width: { mobile: 100, tablet: 160 },
+            borderRadius: {
+              mobile: next ? '4px 0px 0px 4px' : '0px 4px 4px 0px',
+              tablet: 1,
+            },
           }}
         >
-          {previousAndNextButtonsForChapters[next ? 'next' : 'previous']}
+          {matches ? text : arrows}
         </Button>
       )
     }
@@ -102,19 +126,23 @@ function Chapter() {
           )
         : '1'
 
+      const text = `${
+        previousAndNextButtonsForBooks[next ? 'next' : 'previous']
+      } ${number}`
+
       return (
         <Button
           component={Link}
           to={`/${
             previousAndNextButtonsForBooks[next ? 'next' : 'previous']
           }/${number}`}
-          variant="contained"
+          variant={matches ? 'contained' : 'text'}
           sx={{
             textTransform: 'none',
-            width: 160,
+            width: { mobile: 100, tablet: 160 },
           }}
         >
-          {previousAndNextButtonsForBooks[next ? 'next' : 'previous']} {number}
+          {text}
         </Button>
       )
     }
@@ -149,14 +177,19 @@ function Chapter() {
             alignItems="center"
             spacing={2}
           >
-            <Typography
-              variant="h1"
-              sx={{ fontSize: { mobile: 16, tablet: 24 } }}
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              width={1}
+              alignItems="center"
             >
-              {bookName} {chapter}
-            </Typography>
-            <Stack direction="row" justifyContent="space-between" width={1}>
               {renderPreviousAndNextButton(false)}
+              <Typography
+                variant="h1"
+                sx={{ fontSize: { mobile: 16, tablet: 24 } }}
+              >
+                {bookName} {chapter}
+              </Typography>
               {renderPreviousAndNextButton(true)}
             </Stack>
           </Stack>
@@ -164,9 +197,10 @@ function Chapter() {
             sx={{
               p: { mobile: 3, tablet: 5 },
               overflowY: 'scroll',
-              maxHeight: 'calc(70vh)',
+              maxHeight: 'calc(90vh)',
               maxWidth: 'desktop',
               width: 1,
+              borderRadius: { mobile: 0, tablet: 1 },
             }}
           >
             {filteredByBook.length === 0 && (
