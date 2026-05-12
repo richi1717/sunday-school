@@ -38,11 +38,13 @@ const AddLesson = () => {
     if (lessonsData) {
       const books = getOrderedListOfBooksFromLessons(lessonsData)
       const lastBook = books[books.length - 1]
-      const chapters = lessonsData[lastBook]
+      const chapterNums = Object.keys(lessonsData[lastBook] ?? {})
+        .map(Number)
+        .sort((a, b) => a - b)
 
       return {
         lastBook,
-        lastChapter: chapters.length,
+        lastChapter: chapterNums[chapterNums.length - 1] ?? 1,
       }
     }
   }, [lessonsData])
@@ -60,7 +62,7 @@ const AddLesson = () => {
     resolver: yupResolver(lessonsSchema),
     defaultValues: {
       bookName: lastBookAndChapter?.lastBook,
-      chapter: lastBookAndChapter?.lastChapter ?? 1,
+      chapter: String(lastBookAndChapter?.lastChapter ?? 1),
     },
   })
 
@@ -87,7 +89,7 @@ const AddLesson = () => {
   })
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const lessonExists = lessonsData[data.bookName]?.[data.chapter]
+    const lessonExists = lessonsData?.[data.bookName]?.[data.chapter]
 
     if (lessonExists) {
       setOpen(true)

@@ -1,90 +1,59 @@
 import booksOfTheBible from '../constants/booksOfTheBible'
-
-type CurrentLessons = {
-  [key: string]: string[]
-}
+import type { ChapterMap, LessonsData } from '../api/lessons/getLessons'
 
 export const filterByBook = (
-  currentLessons: CurrentLessons,
+  currentLessons: LessonsData | undefined,
   bookName: string,
-) => {
-  const byBook = currentLessons[bookName]
+): ChapterMap => currentLessons?.[bookName] ?? {}
 
-  if (!byBook) return []
-
-  if (!Object.hasOwn(byBook, 'length')) {
-    const keys = Object.keys(byBook)
-    const lastKey = keys[keys.length - 1]
-
-    return new Array(Number(lastKey) + 1)
-      .fill(null)
-      .map((_, index) => byBook[index] ?? null)
-  }
-
-  return byBook
-}
-
-export const getLastBook = (currentLessons: {
-  [key: string]: { [key: string]: string }
-}) => {
-  const items = Object.keys(currentLessons)
-
-  return items[items.length - 1]
-}
+// Returns chapter numbers sorted ascending that have content
+export const getChaptersList = (
+  currentLessons: LessonsData | undefined,
+  book: string,
+): number[] =>
+  Object.keys(filterByBook(currentLessons, book))
+    .map(Number)
+    .sort((a, b) => a - b)
 
 export const getNextAndPreviousBooks = (currentBook: string) => {
   const found = booksOfTheBible.findIndex((book) => book === currentBook)
-
   return {
     previous: booksOfTheBible[found - 1],
     next: booksOfTheBible[found + 1],
   }
 }
 
-export const getChaptersList = (
-  currentLessons: CurrentLessons,
-  book: string,
-) => {
-  const chaptersArr = filterByBook(currentLessons, book)
-
-  return chaptersArr.map((chapter, idx) => chapter && idx).filter((c) => c)
-}
-
 export const getNextAndPreviousChapter = (
-  chaptersArr: string[],
+  chapters: ChapterMap,
   chapter: string,
 ) => {
-  if (chaptersArr.length === 0) return { previous: undefined, next: undefined }
-
-  const chapters = chaptersArr
-    .map((chapter, idx) => chapter && idx)
-    .filter((c) => c)
-
-  const found = chapters.findIndex((chap) => chap === Number(chapter))
-
+  const sorted = Object.keys(chapters)
+    .map(Number)
+    .sort((a, b) => a - b)
+  const found = sorted.indexOf(Number(chapter))
   return {
-    previous: chapters[found - 1],
-    next: chapters[found + 1],
+    previous: sorted[found - 1],
+    next: sorted[found + 1],
   }
 }
 
-export const lastChapterOfPreviousBook = (chapters: string[]) => {
-  const length = chapters.length
-
-  if (length > 0) {
-    return chapters.length - 1
-  }
-
-  return 1
+// Returns the last chapter number in the book, used for cross-book navigation
+export const lastChapterOfPreviousBook = (chapters: ChapterMap): number => {
+  const sorted = Object.keys(chapters)
+    .map(Number)
+    .sort((a, b) => a - b)
+  return sorted[sorted.length - 1] ?? 1
 }
 
 export const getOrderedListOfBooksFromLessons = (
-  currentLessons: CurrentLessons,
-) => booksOfTheBible.filter((book) => currentLessons[book])
+  currentLessons: LessonsData | undefined,
+): (typeof booksOfTheBible)[number][] => {
+  if (!currentLessons) return []
+  return booksOfTheBible.filter((book) => currentLessons[book])
+}
 
 export const getCookie = () => {
   const cookieArr = document.cookie.split(';')
   const found = cookieArr.find((cookie) => cookie.includes('loggedIn'))
-
   return found?.split('=')[1]
 }

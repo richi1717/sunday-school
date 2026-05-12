@@ -1,29 +1,27 @@
 import {
-  Alert,
-  AlertTitle,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
-  Snackbar,
   Stack,
-  TextField,
   Typography,
 } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import booksOfTheBible from '../../constants/booksOfTheBible'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { getOrderedListOfBooksFromLessons } from '../../utils/helpers'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import editLesson from '../../api/lessons/editLesson'
-import { LoadingButton } from '@mui/lab'
 import { useParams } from 'react-router-dom'
 import addLesson from '../../api/lessons/addLesson'
 import { yupResolver } from '@hookform/resolvers/yup'
 import chaptersPerBook from '../../constants/chaptersPerBook'
 import lessonsSchema from '../../schemas/lessonsSchema'
+import MuiTextEditor from './MuiTextEditor'
+import EditLessonSnackbar from './EditLessonSnackbar'
+import { useState } from 'react'
 
 type Inputs = {
   lesson: string
@@ -41,37 +39,30 @@ const EditLesson = () => {
   const queryClient = useQueryClient()
 
   const lastBookAndChapter = useMemo(() => {
-    if (lessonsData) {
-      const books = getOrderedListOfBooksFromLessons(lessonsData)
-      const lastBook = books[books.length - 1]
-      const chapters = lessonsData[lastBook]
-
-      return {
-        lastBook,
-        lastChapter: String(chapters.length - 1),
-      }
+    if (!lessonsData) return undefined
+    const books = getOrderedListOfBooksFromLessons(lessonsData)
+    const lastBook = books[books.length - 1]
+    const chapterKeys = Object.keys(lessonsData[lastBook] ?? {})
+      .map(Number)
+      .sort((a, b) => a - b)
+    return {
+      lastBook,
+      lastChapter: String(chapterKeys[chapterKeys.length - 1] ?? 1),
     }
   }, [lessonsData])
 
-  const lesson = useMemo(() => {
-    if (lessonsData) {
-      if (bookNameParam && chapter) return lessonsData[bookNameParam]?.[chapter]
-
-      const lastBook = lastBookAndChapter?.lastBook
-      const lastChapter = lastBookAndChapter?.lastChapter
-
-      return (
-        (lastBook && lastChapter && lessonsData[lastBook]?.[lastChapter]) ?? ''
-      )
+  const defaultLesson = useMemo(() => {
+    if (!lessonsData) return ''
+    if (bookNameParam && chapter) {
+      return lessonsData[bookNameParam]?.[chapter] ?? ''
     }
-
-    return ''
+    const { lastBook, lastChapter } = lastBookAndChapter ?? {}
+    return (lastBook && lastChapter && lessonsData[lastBook]?.[lastChapter]) ?? ''
   }, [lessonsData, bookNameParam, chapter, lastBookAndChapter])
 
   const {
-    register,
     handleSubmit,
-    formState: { errors, isDirty, isValid },
+    formState: { isDirty, isValid },
     control,
     getValues,
     watch,
@@ -84,27 +75,27 @@ const EditLesson = () => {
         (bookNameParam as (typeof booksOfTheBible)[number]) ||
         lastBookAndChapter?.lastBook,
       chapter: chapter || lastBookAndChapter?.lastChapter || '1',
+      lesson: defaultLesson,
     },
   })
 
   const bookName = watch('bookName') as (typeof booksOfTheBible)[number]
+  const selectedChapter = watch('chapter')
 
   const chaptersList = useMemo(() => {
-    if (lessonsData) {
-      return Array.from(
-        {
-          length: chaptersPerBook[bookName],
-        },
-        (_, k) => k + 1,
-      )
-    }
+    if (!lessonsData) return []
+    return Array.from({ length: chaptersPerBook[bookName] }, (_, k) => k + 1)
   }, [lessonsData, bookName])
+
+  const lessonExists = useMemo(() => {
+    if (!lessonsData || !bookName) return false
+    return lessonsData[bookName]?.[selectedChapter] != null
+  }, [lessonsData, bookName, selectedChapter])
 
   const editLessonMutation = useMutation({
     mutationFn: async (args: Inputs) => {
       await editLesson(args)
       queryClient.invalidateQueries({ queryKey: ['lessons'] })
-      return true
     },
   })
 
@@ -112,14 +103,10 @@ const EditLesson = () => {
     mutationFn: async (args: Inputs) => {
       await addLesson(args)
       queryClient.invalidateQueries({ queryKey: ['lessons'] })
-
-      return true
     },
   })
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
-    const lessonExists = lessonsData[data.bookName]?.[data.chapter]
-
     if (lessonExists) {
       await editLessonMutation.mutateAsync(data)
     } else {
@@ -145,46 +132,16 @@ const EditLesson = () => {
       spacing={2}
       onSubmit={handleSubmit(onSubmit)}
     >
-      <Snackbar
-        autoHideDuration={2000}
-        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      <EditLessonSnackbar
         open={open}
-      >
-        <Alert
-          onClose={() => setOpen(false)}
-          severity="error"
-          sx={{ width: 1, '& .MuiAlert-message': { width: 1 } }}
-        >
-          <AlertTitle>
-            There are no notes for {bookName} {getValues('chapter')}
-          </AlertTitle>
-          Would you like to add new notes for this chapter instead?
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="flex-end"
-            sx={{ mt: 2 }}
-          >
-            <LoadingButton
-              sx={{ textTransform: 'none' }}
-              variant="contained"
-              onClick={() => setOpen(false)}
-            >
-              No
-            </LoadingButton>
-            <LoadingButton
-              sx={{ textTransform: 'none' }}
-              variant="contained"
-              onClick={handleSubmit(onSubmitAdd)}
-              loading={addLessonMutation.isPending}
-            >
-              Yes
-            </LoadingButton>
-          </Stack>
-        </Alert>
-      </Snackbar>
+        setOpen={setOpen}
+        bookName={bookName}
+        chapter={getValues('chapter')}
+        handleSubmit={handleSubmit(onSubmitAdd)}
+        loading={addLessonMutation.isPending}
+      />
       <Typography variant="h1" sx={{ fontSize: { mobile: 24, tablet: 30 } }}>
-        Edit lesson
+        {lessonExists ? 'Edit lesson' : 'Add lesson'}
       </Typography>
       <Stack spacing={2} width={1}>
         <Controller
@@ -196,12 +153,9 @@ const EditLesson = () => {
                 labelId="book"
                 label="Book of the Bible"
                 onChange={(event: SelectChangeEvent) => {
+                  const newBook = event.target.value as (typeof booksOfTheBible)[number]
                   setValue('chapter', '1')
-                  setValue(
-                    'lesson',
-                    lessonsData[bookName]?.[getValues('chapter')],
-                  )
-
+                  setValue('lesson', lessonsData?.[newBook]?.['1'] ?? '')
                   return field.onChange(event)
                 }}
               >
@@ -227,15 +181,14 @@ const EditLesson = () => {
                 onChange={(event: SelectChangeEvent) => {
                   setValue(
                     'lesson',
-                    lessonsData[bookName]?.[event.target.value],
+                    lessonsData?.[bookName]?.[event.target.value] ?? '',
                   )
-
                   return field.onChange(event)
                 }}
               >
-                {chaptersList?.map((book) => (
-                  <MenuItem key={book} value={book}>
-                    {book}
+                {chaptersList.map((chapterNum) => (
+                  <MenuItem key={chapterNum} value={chapterNum}>
+                    {chapterNum}
                   </MenuItem>
                 ))}
               </Select>
@@ -244,26 +197,20 @@ const EditLesson = () => {
           control={control}
           name="chapter"
         />
-        <TextField
-          error={!!errors.lesson}
-          multiline
-          minRows={4}
-          maxRows={35}
-          defaultValue={lesson}
-          label="Your notes"
-          helperText={(errors.lesson?.message as string) ?? ''}
-          placeholder="https://www.markdownguide.org/cheat-sheet/ to learn how to use markdown"
-          {...register('lesson')}
+        <Controller
+          name="lesson"
+          control={control}
+          rules={{ required: 'Lesson is required' }}
+          render={({ field }) => (
+            <MuiTextEditor
+              value={field.value ?? ''}
+              onChange={field.onChange}
+              onBlur={field.onBlur}
+              disabled={!isDirty || !isValid}
+              loading={editLessonMutation.isPending}
+            />
+          )}
         />
-        <LoadingButton
-          loading={editLessonMutation.isPending}
-          type="submit"
-          variant="contained"
-          sx={{ textTransform: 'none' }}
-          disabled={!isDirty || !isValid}
-        >
-          Update
-        </LoadingButton>
       </Stack>
     </Stack>
   )

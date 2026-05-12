@@ -35,7 +35,7 @@ function Chapter() {
   )
 
   const filteredByChapter = useMemo(
-    () => filteredByBook[Number(chapter)],
+    () => filteredByBook[chapter],
     [filteredByBook, chapter],
   )
 
@@ -71,7 +71,7 @@ function Chapter() {
     }
     if (previousAndNextButtonsForBooks.previous) {
       const number = lastChapterOfPreviousBook(
-        filterByBook(lessonsData, previousAndNextButtonsForBooks.previous),
+        filterByBook(lessonsData, previousAndNextButtonsForBooks.previous ?? ''),
       )
 
       return navigate(`/${previousAndNextButtonsForBooks.previous}/${number}`)
@@ -122,7 +122,7 @@ function Chapter() {
     if (previousAndNextButtonsForBooks[next ? 'next' : 'previous']) {
       const number = !next
         ? lastChapterOfPreviousBook(
-            filterByBook(lessonsData, previousAndNextButtonsForBooks.previous),
+            filterByBook(lessonsData, previousAndNextButtonsForBooks.previous ?? ''),
           )
         : '1'
 
@@ -203,19 +203,26 @@ function Chapter() {
               borderRadius: { mobile: 0, tablet: 1 },
             }}
           >
-            {filteredByBook.length === 0 && (
+            {Object.keys(filteredByBook).length === 0 && (
               <Stack alignItems="center" direction="column" spacing={4}>
                 <Typography fontSize={32}>Coming soon</Typography>
                 <EngineeringIcon sx={{ height: 100, width: 100 }} />
               </Stack>
             )}
             {filteredByChapter && (
-              <Typography
-                component={MuiMarkdown}
-                sx={{ pb: 5, maxWidth: 1, '& a': { wordBreak: 'break-all' } }}
-              >
-                {filteredByChapter}
-              </Typography>
+              filteredByChapter.trimStart().startsWith('<') ? (
+                <Box
+                  sx={{ pb: 5, maxWidth: 1, '& a': { wordBreak: 'break-all' } }}
+                  dangerouslySetInnerHTML={{ __html: filteredByChapter }}
+                />
+              ) : (
+                <Typography
+                  component={MuiMarkdown}
+                  sx={{ pb: 5, maxWidth: 1, '& a': { wordBreak: 'break-all' } }}
+                >
+                  {filteredByChapter}
+                </Typography>
+              )
             )}
           </Card>
         </Stack>

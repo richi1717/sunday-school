@@ -12,14 +12,16 @@ export default function Welcome() {
       const books = getOrderedListOfBooksFromLessons(lessonsData)
       const lastBook = books[books.length - 1]
       const firstBook = books[0]
-      const chapters = lessonsData[lastBook]
-      const firstChapters = lessonsData[firstBook]
-      const firstChapter = firstChapters.findIndex((chapter: string) => chapter)
+      const sortedChapterNums = (chapterKey: typeof lessonsData[string]) =>
+        Object.keys(chapterKey ?? {}).map(Number).sort((a, b) => a - b)
+
+      const lastChapter = sortedChapterNums(lessonsData[lastBook]).at(-1) ?? 1
+      const firstChapter = sortedChapterNums(lessonsData[firstBook])[0] ?? 1
 
       return {
-        last: `${lastBook}/${chapters.length - 1}`,
+        last: `${lastBook}/${lastChapter}`,
         lastBook,
-        lastChapter: chapters.length - 1,
+        lastChapter,
         first: `${firstBook}/${firstChapter}`,
         firstBook,
         firstChapter,

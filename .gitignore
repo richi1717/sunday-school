@@ -23,3 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 .vercel
+
+# Firebase exports (contain DB credentials/data — keep locally as backups only)
+*-default-rtdb-export*.json
+*-migrated.json
