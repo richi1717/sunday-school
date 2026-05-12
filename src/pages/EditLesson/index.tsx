@@ -1,4 +1,5 @@
 import {
+  Button,
   FormControl,
   InputLabel,
   MenuItem,
@@ -14,7 +15,7 @@ import { getOrderedListOfBooksFromLessons } from '../../utils/helpers'
 import { useForm, SubmitHandler, Controller } from 'react-hook-form'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import editLesson from '../../api/lessons/editLesson'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import addLesson from '../../api/lessons/addLesson'
 import { yupResolver } from '@hookform/resolvers/yup'
 import chaptersPerBook from '../../constants/chaptersPerBook'
@@ -140,9 +141,22 @@ const EditLesson = () => {
         handleSubmit={handleSubmit(onSubmitAdd)}
         loading={addLessonMutation.isPending}
       />
-      <Typography variant="h1" sx={{ fontSize: { mobile: 24, tablet: 30 } }}>
-        {lessonExists ? 'Edit lesson' : 'Add lesson'}
-      </Typography>
+      <Stack direction="row" alignItems="center" spacing={2}>
+        <Typography variant="h1" sx={{ fontSize: { mobile: 24, tablet: 30 } }}>
+          {lessonExists ? 'Edit lesson' : 'Add lesson'}
+        </Typography>
+        {lessonExists && (
+          <Button
+            component={Link}
+            to={`/${bookName}/${selectedChapter}`}
+            variant="text"
+            size="small"
+            sx={{ textTransform: 'none' }}
+          >
+            View lesson →
+          </Button>
+        )}
+      </Stack>
       <Stack spacing={2} width={1}>
         <Controller
           render={({ field }) => (

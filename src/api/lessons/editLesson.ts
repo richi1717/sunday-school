@@ -17,11 +17,12 @@ interface EditLessonProps {
   lesson: string
 }
 const editLesson = async ({ bookName, chapter, lesson }: EditLessonProps) => {
-  await update(ref(db, `studies/${bookName}`), {
-    [chapter]: lesson,
-  })
-
-  console.log('looks like we made it!')
+  await Promise.all([
+    update(ref(db, `studies/${bookName}`), { [chapter]: lesson }),
+    update(ref(db, `studiesMeta/${bookName}`), {
+      [chapter]: new Date().toISOString(),
+    }),
+  ])
 }
 
 export default editLesson

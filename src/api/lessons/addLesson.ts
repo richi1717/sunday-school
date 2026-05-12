@@ -18,9 +18,12 @@ interface UpdateLessonsProps {
   lesson: string
 }
 const addLesson = async ({ bookName, chapter, lesson }: UpdateLessonsProps) => {
-  return await update(ref(db, `studies/${bookName}`), {
-    [chapter]: lesson,
-  })
+  await Promise.all([
+    update(ref(db, `studies/${bookName}`), { [chapter]: lesson }),
+    update(ref(db, `studiesMeta/${bookName}`), {
+      [chapter]: new Date().toISOString(),
+    }),
+  ])
 }
 
 export default addLesson

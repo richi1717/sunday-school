@@ -2,15 +2,19 @@ import {
   Box,
   Button,
   Card,
+  IconButton,
+  Snackbar,
   Stack,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
 } from '@mui/material'
 import ArrowCircleLeftOutlinedIcon from '@mui/icons-material/ArrowCircleLeftOutlined'
 import ArrowCircleRightOutlinedIcon from '@mui/icons-material/ArrowCircleRightOutlined'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import EngineeringIcon from '@mui/icons-material/Engineering'
-import { useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import MuiMarkdown from 'markdown-to-jsx'
 import {
   filterByBook,
@@ -19,6 +23,7 @@ import {
   lastChapterOfPreviousBook,
 } from '../../utils/helpers'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
+import { useStudiesMetaQuery } from '../../api/lessons/getStudiesMeta'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import useSwipe from '../../utils/useSwipe'
 
@@ -26,8 +31,24 @@ function Chapter() {
   const navigate = useNavigate()
   const { bookName = '', chapter = '' } = useParams()
   const { data: lessonsData } = useLessonsQuery()
+  const { data: metaData } = useStudiesMetaQuery()
+  const [copied, setCopied] = useState(false)
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.up('tablet'))
+
+  const updatedAt = metaData?.[bookName]?.[chapter]
+  const formattedDate = updatedAt
+    ? new Date(updatedAt).toLocaleDateString('en-US', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric',
+      })
+    : null
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href)
+    setCopied(true)
+  }
 
   const filteredByBook = useMemo(
     () => filterByBook(lessonsData, bookName),
@@ -184,12 +205,23 @@ function Chapter() {
               alignItems="center"
             >
               {renderPreviousAndNextButton(false)}
-              <Typography
-                variant="h1"
-                sx={{ fontSize: { mobile: 16, tablet: 24 } }}
-              >
-                {bookName} {chapter}
-              </Typography>
+              <Stack direction="row" alignItems="center" spacing={0.5}>
+                <Typography
+                  variant="h1"
+                  sx={{ fontSize: { mobile: 16, tablet: 24 } }}
+                >
+                  {bookName} {chapter}
+                </Typography>
+                <Tooltip title="Copy link">
+                  <IconButton
+                    size="small"
+                    onClick={handleCopyLink}
+                    sx={{ color: 'text.secondary' }}
+                  >
+                    <ContentCopyIcon fontSize="small" />
+                  </IconButton>
+                </Tooltip>
+              </Stack>
               {renderPreviousAndNextButton(true)}
             </Stack>
           </Stack>
@@ -209,6 +241,15 @@ function Chapter() {
                 <EngineeringIcon sx={{ height: 100, width: 100 }} />
               </Stack>
             )}
+            {formattedDate && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ display: 'block', textAlign: 'right', mb: 1 }}
+              >
+                Last edited: {formattedDate}
+              </Typography>
+            )}
             {filteredByChapter && (
               filteredByChapter.trimStart().startsWith('<') ? (
                 <Box
@@ -216,7 +257,7 @@ function Chapter() {
                     pb: 5,
                     maxWidth: 1,
                     fontFamily: 'Lora, serif',
-                    fontSize: { mobile: '1rem', tablet: '1.05rem' },
+                    fontSize: { mobile: '1.05rem', tablet: '1.1rem' },
                     lineHeight: 1.8,
                     '& a': { wordBreak: 'break-all' },
                     '& h3, & h4, & h5': {
@@ -251,6 +292,13 @@ function Chapter() {
           </Card>
         </Stack>
       </Stack>
+      <Snackbar
+        open={copied}
+        autoHideDuration={2000}
+        onClose={() => setCopied(false)}
+        message="Link copied!"
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      />
     </Stack>
   )
 }

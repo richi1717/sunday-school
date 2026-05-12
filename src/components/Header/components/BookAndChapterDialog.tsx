@@ -1,17 +1,15 @@
 import {
-  Accordion,
-  AccordionDetails,
-  AccordionSummary,
+  Box,
   Button,
   Dialog,
   DialogContent,
   DialogTitle,
   IconButton,
   Stack,
+  Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
 import { Link, useParams } from 'react-router-dom'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { useLessonsQuery } from '../../../api/lessons/getLessons'
 import { useMemo } from 'react'
 import {
@@ -45,63 +43,59 @@ export default function BookAndChapterDialog({
         <IconButton
           aria-label="close"
           onClick={closeDialog}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-          }}
+          sx={{ position: 'absolute', right: 8, top: 8 }}
         >
           <CloseIcon />
         </IconButton>
       </DialogTitle>
       <DialogContent sx={{ mt: 3 }}>
-        <Stack sx={{ width: { mobile: 1, tablet: 500 } }} spacing={2}>
-          {orderedLessons.map((book, idx) => (
-            <Accordion
-              key={book}
-              TransitionProps={{ unmountOnExit: true }}
-              defaultExpanded={
-                bookName === book ||
-                (!bookName && idx + 1 === orderedLessons.length)
-              }
-            >
-              <AccordionSummary expandIcon={<ExpandMoreIcon />}>
+        <Stack sx={{ width: { mobile: 1, tablet: 500 } }} spacing={3}>
+          {orderedLessons.map((book) => (
+            <Box key={book}>
+              <Typography
+                variant="subtitle1"
+                sx={{
+                  fontWeight: 'bold',
+                  mb: 1,
+                  color: book === bookName ? 'primary.main' : 'text.primary',
+                }}
+              >
                 {book}
-              </AccordionSummary>
-              <AccordionDetails>
-                <Grid container justifyContent="start" spacing={2}>
-                  {getChaptersList(lessonsData, book).map((chapter) => (
-                    <Grid key={chapter}>
-                      <Button
-                        component={Link}
-                        to={`/${book}/${chapter}`}
-                        sx={{
-                          height: 50,
-                          width: 50,
-                          backgroundColor: (theme) =>
-                            book === bookName && String(chapter) === currentChapter
-                              ? theme.palette.primary.main
-                              : theme.palette.mode === 'dark'
-                                ? '#1A2027'
-                                : '#fff',
-                          fontWeight:
-                            book === bookName && String(chapter) === currentChapter
-                              ? 'bold'
-                              : 'normal',
-                          color:
-                            book === bookName && String(chapter) === currentChapter
-                              ? 'primary.contrastText'
-                              : undefined,
-                        }}
-                        onClick={closeDialog}
-                      >
-                        {chapter}
-                      </Button>
-                    </Grid>
-                  ))}
-                </Grid>
-              </AccordionDetails>
-            </Accordion>
+              </Typography>
+              <Grid container justifyContent="start" spacing={1}>
+                {getChaptersList(lessonsData, book).map((chapter) => (
+                  <Grid key={chapter}>
+                    <Button
+                      component={Link}
+                      to={`/${book}/${chapter}`}
+                      sx={{
+                        height: 44,
+                        width: 44,
+                        minWidth: 0,
+                        backgroundColor: (theme) =>
+                          book === bookName &&
+                          String(chapter) === currentChapter
+                            ? theme.palette.primary.main
+                            : theme.palette.mode === 'dark'
+                              ? '#1A2027'
+                              : '#fff',
+                        fontWeight:
+                          book === bookName && String(chapter) === currentChapter
+                            ? 'bold'
+                            : 'normal',
+                        color:
+                          book === bookName && String(chapter) === currentChapter
+                            ? 'primary.contrastText'
+                            : undefined,
+                      }}
+                      onClick={closeDialog}
+                    >
+                      {chapter}
+                    </Button>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           ))}
         </Stack>
       </DialogContent>
