@@ -9,12 +9,13 @@ import {
 } from '@mui/material'
 import { deepPurple } from '@mui/material/colors'
 import AccountCircleIcon from '@mui/icons-material/AccountCircle'
+import SearchIcon from '@mui/icons-material/Search'
 import Avatar from '@mui/material/Avatar'
 import ChurchOutlinedIcon from '@mui/icons-material/ChurchOutlined'
 import { useTheme } from '@mui/material/styles'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import BookAndChapterDialog from './components/BookAndChapterDialog'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink, useNavigate, useParams } from 'react-router-dom'
 import { getCookie } from '../../utils/helpers'
 import LoginDialog from './components/LoginDialog'
 import Drawer from './components/Drawer'
@@ -31,6 +32,8 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
   const theme = useTheme()
   const matches = useMediaQuery(theme.breakpoints.down('tablet'))
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
+  const navigate = useNavigate()
+  const { bookName: currentBook, chapter: currentChapter } = useParams()
 
   const adminName = useMemo(() => {
     const cookieName = getCookie()
@@ -66,8 +69,16 @@ export default function Header({ isAdmin, setIsAdmin }: HeaderProps) {
                 }}
                 onClick={() => setBookSelectOpen(true)}
               >
-                Book & Chapter
+                {currentBook && currentChapter
+                  ? `${currentBook} ${currentChapter} ▾`
+                  : 'Book & Chapter'}
               </Button>
+              <IconButton
+                sx={{ color: 'common.white' }}
+                onClick={() => navigate('/search')}
+              >
+                <SearchIcon />
+              </IconButton>
             </Stack>
             <Stack direction="row" flexGrow={0}>
               <IconButton

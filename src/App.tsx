@@ -8,6 +8,7 @@ import { ColorModeContext, Mode } from './components/ToggleColorMode'
 import { RouterProvider } from 'react-router-dom'
 import Router from './Router'
 import '@fontsource/inter'
+import '@fontsource/lora'
 
 const queryClient = new QueryClient()
 

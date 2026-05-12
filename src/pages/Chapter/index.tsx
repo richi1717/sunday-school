@@ -212,7 +212,31 @@ function Chapter() {
             {filteredByChapter && (
               filteredByChapter.trimStart().startsWith('<') ? (
                 <Box
-                  sx={{ pb: 5, maxWidth: 1, '& a': { wordBreak: 'break-all' } }}
+                  sx={{
+                    pb: 5,
+                    maxWidth: 1,
+                    fontFamily: 'Lora, serif',
+                    fontSize: { mobile: '1rem', tablet: '1.05rem' },
+                    lineHeight: 1.8,
+                    '& a': { wordBreak: 'break-all' },
+                    '& h3, & h4, & h5': {
+                      fontFamily: 'Inter, sans-serif',
+                      borderLeft: '3px solid',
+                      borderColor: 'primary.main',
+                      pl: 1.5,
+                      mt: 4,
+                      mb: 1,
+                    },
+                    '& p': { mt: 0, mb: 1.5 },
+                    '& table': { borderCollapse: 'collapse', width: 1, mb: 2 },
+                    '& th, & td': {
+                      border: '1px solid',
+                      borderColor: 'divider',
+                      p: 1,
+                      textAlign: 'left',
+                    },
+                    '& th': { fontWeight: 'bold', bgcolor: 'action.hover' },
+                  }}
                   dangerouslySetInnerHTML={{ __html: filteredByChapter }}
                 />
               ) : (

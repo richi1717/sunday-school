@@ -32,7 +32,7 @@ export default function BookAndChapterDialog({
   fullScreen = false,
 }: BookAndChapterDialogProps) {
   const { data: lessonsData } = useLessonsQuery()
-  const { bookName = '' } = useParams()
+  const { bookName = '', chapter: currentChapter = '' } = useParams()
 
   const orderedLessons = useMemo(
     () => getOrderedListOfBooksFromLessons(lessonsData),
@@ -79,7 +79,19 @@ export default function BookAndChapterDialog({
                           height: 50,
                           width: 50,
                           backgroundColor: (theme) =>
-                            theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+                            book === bookName && String(chapter) === currentChapter
+                              ? theme.palette.primary.main
+                              : theme.palette.mode === 'dark'
+                                ? '#1A2027'
+                                : '#fff',
+                          fontWeight:
+                            book === bookName && String(chapter) === currentChapter
+                              ? 'bold'
+                              : 'normal',
+                          color:
+                            book === bookName && String(chapter) === currentChapter
+                              ? 'primary.contrastText'
+                              : undefined,
                         }}
                         onClick={closeDialog}
                       >
