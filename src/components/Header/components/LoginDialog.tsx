@@ -3,120 +3,76 @@ import {
   Alert,
   Button,
   Dialog,
-  DialogActions,
   DialogContent,
-  DialogTitle,
   IconButton,
   Stack,
-  TextField,
+  Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { useTheme } from '@mui/material/styles'
-import useMediaQuery from '@mui/material/useMediaQuery'
-import axios from 'axios'
-import { useMutation } from '@tanstack/react-query'
+import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { auth } from '../../../api/firebase'
+
+const provider = new GoogleAuthProvider()
 
 interface LoginDialogProps {
-  setIsAdmin: (isAdmin: boolean) => void
-  name: string
-  setName: (name: string) => void
   open: boolean
   closeDialog: () => void
 }
 
-export default function LoginDialog({
-  setIsAdmin,
-  name,
-  setName,
-  closeDialog,
-  open,
-}: LoginDialogProps) {
-  const [password, setPassword] = useState('')
+export default function LoginDialog({ closeDialog, open }: LoginDialogProps) {
   const [error, setError] = useState('')
-  const theme = useTheme()
-  const matches = useMediaQuery(theme.breakpoints.down('tablet'))
+  const [loading, setLoading] = useState(false)
 
-  const loginMutation = useMutation({
-    mutationFn: async () => {
-      const { data } = await axios.get(
-        `${import.meta.env.VITE_DB_URL}/login.json`,
-      )
-
-      return data
-    },
-    onError: (err) => {
-      console.error(err)
-      setError('Something went wrong, please try again later.')
-    },
-    onSuccess: (data) => {
-      const found = data[name]
-      if (found) {
-        if (found === password) {
-          document.cookie = `loggedIn=${name}; expires=Thu, 31 Dec 2099 23:59:59 GMT`
-          setPassword('')
-          closeDialog()
-          setIsAdmin(true)
-        } else {
-          setError('Unauthorized')
-        }
-      } else {
-        setError('User not found')
-      }
-    },
-  })
+  const handleGoogleSignIn = async () => {
+    setError('')
+    setLoading(true)
+    try {
+      await signInWithPopup(auth, provider)
+      closeDialog()
+    } catch {
+      setError('Sign-in failed. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
-    <Dialog open={open} onClose={closeDialog} fullScreen={matches}>
-      <DialogTitle
-        sx={{ textAlign: 'center', fontSize: { mobile: 30, tablet: 44 } }}
+    <Dialog open={open} onClose={closeDialog} PaperProps={{ sx: { width: 320 } }}>
+      <IconButton
+        aria-label="close"
+        onClick={closeDialog}
+        sx={{ position: 'absolute', right: 8, top: 8 }}
       >
-        Login to edit
-        <IconButton
-          aria-label="close"
-          onClick={closeDialog}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-          }}
-        >
-          <CloseIcon />
-        </IconButton>
-      </DialogTitle>
-      {error && (
-        <Alert severity="error" sx={{ mx: 3 }}>
-          {error}
-        </Alert>
-      )}
+        <CloseIcon />
+      </IconButton>
       <DialogContent>
-        <Stack
-          sx={{ minWidth: { mobile: 1, tablet: 400 }, pt: 1 }}
-          spacing={2}
-          component="form"
-          onSubmit={(e) => {
-            e.preventDefault()
-            loginMutation.mutate()
-          }}
-        >
-          <TextField
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            label="Name"
-          />
-          <TextField
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            label="Password"
-          />
-          <DialogActions sx={{ p: 0 }}>
-            <Button
-              type="submit"
-              sx={{ textTransform: 'none', width: 1 }}
-              variant="contained"
-            >
-              Login
-            </Button>
-          </DialogActions>
+        <Stack spacing={3} alignItems="center" sx={{ pt: 2, pb: 1 }}>
+          <Stack spacing={0.5} alignItems="center">
+            <Typography variant="h2" sx={{ fontSize: 22, fontWeight: 600 }}>
+              Admin sign-in
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              For lesson editing only
+            </Typography>
+          </Stack>
+          {error && <Alert severity="error" sx={{ width: 1 }}>{error}</Alert>}
+          <Button
+            onClick={handleGoogleSignIn}
+            disabled={loading}
+            variant="outlined"
+            fullWidth
+            sx={{ textTransform: 'none', py: 1.5 }}
+            startIcon={
+              <img
+                src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                alt=""
+                width={18}
+                height={18}
+              />
+            }
+          >
+            {loading ? 'Signing in…' : 'Sign in with Google'}
+          </Button>
         </Stack>
       </DialogContent>
     </Dialog>

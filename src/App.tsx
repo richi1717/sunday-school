@@ -7,6 +7,7 @@ import myTheme from './theme'
 import { ColorModeContext, Mode } from './components/ToggleColorMode'
 import { RouterProvider } from 'react-router-dom'
 import Router from './Router'
+import { AuthProvider } from './context/AuthContext'
 import '@fontsource/inter'
 import '@fontsource/lora'
 
@@ -36,10 +37,12 @@ function App() {
     <ColorModeContext.Provider value={contextValue}>
       <ThemeProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
-          <CssBaseline />
-          <Stack sx={{ width: 1, height: '100vh' }}>
-            <RouterProvider router={Router} />
-          </Stack>
+          <AuthProvider>
+            <CssBaseline />
+            <Stack sx={{ width: 1, height: '100vh' }}>
+              <RouterProvider router={Router} />
+            </Stack>
+          </AuthProvider>
         </QueryClientProvider>
       </ThemeProvider>
     </ColorModeContext.Provider>

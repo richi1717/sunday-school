@@ -1,16 +1,18 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import { getCookie } from './utils/helpers'
+import { useAuth } from './context/AuthContext'
 import { useEffect } from 'react'
 
 const ProtectedRoute = () => {
+  const { isAdmin, loading } = useAuth()
   const navigate = useNavigate()
-  const isAuthenticated = getCookie() !== 'false'
 
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!loading && !isAdmin) {
       navigate('/')
     }
-  }, [isAuthenticated, navigate])
+  }, [isAdmin, loading, navigate])
+
+  if (loading) return null
 
   return <Outlet />
 }

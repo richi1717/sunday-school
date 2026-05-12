@@ -1,13 +1,14 @@
 import { List, ListItem, ListItemButton, ListItemText } from '@mui/material'
 import ToggleColorMode from '../../ToggleColorMode'
 import { useNavigate, useParams } from 'react-router-dom'
+import { signOut } from 'firebase/auth'
+import { auth } from '../../../api/firebase'
 
 interface AdminListProps {
-  setIsAdmin: () => void
   handleClose: () => void
 }
 
-export default function AdminList({ setIsAdmin, handleClose }: AdminListProps) {
+export default function AdminList({ handleClose }: AdminListProps) {
   const navigate = useNavigate()
   const { bookName = '', chapter = '' } = useParams()
 
@@ -58,9 +59,8 @@ export default function AdminList({ setIsAdmin, handleClose }: AdminListProps) {
       </ListItem>
       <ListItem>
         <ListItemButton
-          onClick={() => {
-            document.cookie = 'loggedIn=false'
-            setIsAdmin()
+          onClick={async () => {
+            await signOut(auth)
             handleClose()
             navigate('/')
           }}

@@ -12,7 +12,6 @@ import NotAdminList from './NotAdminList'
 
 interface DrawerProps {
   isAdmin: boolean
-  setIsAdmin: () => void
   setOpen: () => void
   anchorEl: null | HTMLElement
   setAnchorEl: () => void
@@ -20,7 +19,6 @@ interface DrawerProps {
 
 export default function Drawer({
   isAdmin,
-  setIsAdmin,
   setOpen,
   anchorEl,
   setAnchorEl,
@@ -52,7 +50,7 @@ export default function Drawer({
         </Stack>
         <Divider />
         {isAdmin ? (
-          <AdminList handleClose={handleClose} setIsAdmin={setIsAdmin} />
+          <AdminList handleClose={handleClose} />
         ) : (
           <NotAdminList setAnchorEl={setAnchorEl} setOpen={setOpen} />
         )}

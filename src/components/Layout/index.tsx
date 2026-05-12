@@ -1,21 +1,14 @@
-import { useEffect, useState } from 'react'
 import { CircularProgress, Stack } from '@mui/material'
 import { useLessonsQuery } from '../../api/lessons/getLessons'
 import { Outlet } from 'react-router-dom'
 import Header from '../Header'
-import { getCookie } from '../../utils/helpers'
+import { useAuth } from '../../context/AuthContext'
 
 export default function Layout() {
-  const [isAdmin, setIsAdmin] = useState(false)
+  const { isAdmin, loading: authLoading } = useAuth()
   const { isLoading } = useLessonsQuery()
 
-  useEffect(() => {
-    const cookie = getCookie()
-
-    setIsAdmin(!!cookie && cookie !== 'false')
-  }, [isAdmin])
-
-  if (isLoading)
+  if (isLoading || authLoading)
     return (
       <Stack alignItems="center" width={1} height={1} justifyContent="center">
         <CircularProgress />
@@ -24,7 +17,7 @@ export default function Layout() {
 
   return (
     <Stack height={1} alignItems="center">
-      <Header isAdmin={isAdmin} setIsAdmin={setIsAdmin} />
+      <Header isAdmin={isAdmin} />
       <Outlet />
     </Stack>
   )
