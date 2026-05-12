@@ -1,10 +1,12 @@
 import {
+  Alert,
   Button,
   FormControl,
   InputLabel,
   MenuItem,
   Select,
   SelectChangeEvent,
+  Snackbar,
   Stack,
   Typography,
 } from '@mui/material'
@@ -32,6 +34,7 @@ type Inputs = {
 
 const EditLesson = () => {
   const [open, setOpen] = useState(false)
+  const [saved, setSaved] = useState(false)
   const {
     bookName: bookNameParam = '' as (typeof booksOfTheBible)[number],
     chapter = '',
@@ -68,6 +71,7 @@ const EditLesson = () => {
     getValues,
     watch,
     setValue,
+    reset,
   } = useForm<Inputs>({
     mode: 'onTouched',
     resolver: yupResolver(lessonsSchema),
@@ -110,6 +114,8 @@ const EditLesson = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     if (lessonExists) {
       await editLessonMutation.mutateAsync(data)
+      reset(data)
+      setSaved(true)
     } else {
       setOpen(true)
     }
@@ -133,6 +139,16 @@ const EditLesson = () => {
       spacing={2}
       onSubmit={handleSubmit(onSubmit)}
     >
+      <Snackbar
+        open={saved}
+        autoHideDuration={3000}
+        onClose={() => setSaved(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setSaved(false)}>
+          Lesson saved!
+        </Alert>
+      </Snackbar>
       <EditLessonSnackbar
         open={open}
         setOpen={setOpen}
