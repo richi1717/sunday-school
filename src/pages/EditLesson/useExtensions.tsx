@@ -100,7 +100,7 @@ export default function useExtensions({
       FontSize,
       Highlight.configure({ multicolor: true }),
       HorizontalRule,
-      ResizableImage,
+      ResizableImage.configure({ allowBase64: true }),
       Dropcursor,
       TaskList,
       TaskItem.configure({
