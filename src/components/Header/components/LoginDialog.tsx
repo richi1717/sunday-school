@@ -9,10 +9,14 @@ import {
   Typography,
 } from '@mui/material'
 import CloseIcon from '@mui/icons-material/Close'
-import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth'
+import { signInWithPopup, signOut, GoogleAuthProvider } from 'firebase/auth'
 import { auth } from '../../../api/firebase'
 
 const provider = new GoogleAuthProvider()
+
+const allowedEmails = (import.meta.env.VITE_ALLOWED_EMAILS as string)
+  ?.split(',')
+  .map((email) => email.trim().toLowerCase()) ?? []
 
 interface LoginDialogProps {
   open: boolean
@@ -27,7 +31,12 @@ export default function LoginDialog({ closeDialog, open }: LoginDialogProps) {
     setError('')
     setLoading(true)
     try {
-      await signInWithPopup(auth, provider)
+      const result = await signInWithPopup(auth, provider)
+      if (!allowedEmails.includes(result.user.email?.toLowerCase() ?? '')) {
+        await signOut(auth)
+        setError('This account doesn\'t have edit access.')
+        return
+      }
       closeDialog()
     } catch {
       setError('Sign-in failed. Please try again.')

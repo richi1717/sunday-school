@@ -16,10 +16,15 @@ const queryClient = new QueryClient()
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)')
   const [mode, setMode] = React.useState<Mode>(
-    prefersDarkMode ? 'dark' : 'light',
+    () =>
+      (localStorage.getItem('colorMode') as Mode) ??
+      (prefersDarkMode ? 'dark' : 'light'),
   )
 
-  const setColorMode = useCallback((mode: Mode) => setMode(mode), [setMode])
+  const setColorMode = useCallback((newMode: Mode) => {
+    localStorage.setItem('colorMode', newMode)
+    setMode(newMode)
+  }, [])
 
   const contextValue = React.useMemo(
     () => ({ mode, setColorMode }),
